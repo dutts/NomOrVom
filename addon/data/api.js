@@ -3,13 +3,13 @@
 function Poop(element) {
     var img = document.createElement('img');
     img.src = self.options.prefixDataURI + 'poop.png';
-    element.append(img);
+    element.appendChild(img);
 }
 
 function Thumb(element) {
     var img = document.createElement('img');
     img.src = self.options.prefixDataURI + 'good.png';
-    element.append(img);
+    element.appendChild(img);
 }
 
 $("article").each(function () {
@@ -19,9 +19,17 @@ $("article").each(function () {
 
     var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
 
-    //var scorePlaceholder = document.createElement('span');
-    //$(scorePlaceholder).append("xxx");
-    //$(this).append(scorePlaceholder);
+    var scorePlaceholder = document.createElement('div');
+	scorePlaceholder.style.border = "thin dashed red";
+    scorePlaceholder.style.padding = "5px";
+	scorePlaceholder.style.margin = "5px";
+	scorePlaceholder.width = "50%";
+	
+	var loaderImg = document.createElement('img');
+    loaderImg.src = self.options.prefixDataURI + 'ajax-loader.gif';
+    scorePlaceholder.appendChild(loaderImg);
+	
+    _this.append(scorePlaceholder);
 
     $.ajax({
         url: url,
@@ -29,18 +37,21 @@ $("article").each(function () {
         dataType: 'json',
         cache: false,
         success: function (data, status) {
-            var rating = data.establishments[0].RatingValue;
-            //var img = document.createElement('img');
-            //img.src = self.options.prefixDataURI + rating + '.png';
-            //_this.append(img);
-            for (var i = 0; i < rating; i++) {
-                Thumb(_this);
-            }
-            for (var i = 0; i < 5 - rating; i++) {
-                Poop(_this);
-            }
+			if (data.establishments.length > 0) {
+				scorePlaceholder.removeChild(loaderImg);
+				var rating = data.establishments[0].RatingValue;
+				//var img = document.createElement('img');
+				//img.src = self.options.prefixDataURI + rating + '.png';
+				//_this.append(img);
+				for (var i = 0; i < rating; i++) {
+					Thumb(scorePlaceholder);
+				}
+				for (var i = 0; i < 5 - rating; i++) {
+					Poop(scorePlaceholder);
+				}
+			}
         },
-        error: function (error) { alert(error); },
+        error: function (error) { },
         beforeSend: function (xhr) { xhr.setRequestHeader('x-api-version', 2); }
     });
 });
