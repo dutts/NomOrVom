@@ -1,8 +1,8 @@
 // http://www.just-eat.co.uk/area/nn6-creaton
 
-function Poop(element) {
+function AppendImg(element, filename) {
     var img = document.createElement('img');
-    img.src = self.options.prefixDataURI + 'poop.png';
+    img.src = self.options.prefixDataURI + filename;
     element.appendChild(img);
 }
 
@@ -25,9 +25,16 @@ $("article").each(function () {
 	scorePlaceholder.style.margin = "5px";
 	scorePlaceholder.width = "50%";
 	
+	var loadingText = document.createElement('p');
+	loadingText.style.fontWeight = "bold";
+	loadingText.style.padding = "0px 5px";
+	$(loadingText).text("Loading food scores...");
+	
 	var loaderImg = document.createElement('img');
     loaderImg.src = self.options.prefixDataURI + 'ajax-loader.gif';
-    scorePlaceholder.appendChild(loaderImg);
+    
+	scorePlaceholder.appendChild(loadingText);
+	scorePlaceholder.appendChild(loaderImg);
 	
     _this.append(scorePlaceholder);
 
@@ -38,17 +45,23 @@ $("article").each(function () {
         cache: false,
         success: function (data, status) {
 			if (data.establishments.length > 0) {
+				scorePlaceholder.removeChild(loadingText);
 				scorePlaceholder.removeChild(loaderImg);
 				var rating = data.establishments[0].RatingValue;
 				//var img = document.createElement('img');
 				//img.src = self.options.prefixDataURI + rating + '.png';
 				//_this.append(img);
 				for (var i = 0; i < rating; i++) {
-					Thumb(scorePlaceholder);
+					AppendImg(scorePlaceholder, 'good.png');
 				}
 				for (var i = 0; i < 5 - rating; i++) {
-					Poop(scorePlaceholder);
+					AppendImg(scorePlaceholder, 'poop.png');
 				}
+				var resultText = document.createElement('p');
+				resultText.style.fontWeight = "bold";
+				resultText.style.margin = "0px 5px";
+				$(resultText).text("Hygiene Score : " + rating + "/5");
+				scorePlaceholder.appendChild(resultText);
 			}
         },
         error: function (error) { },
