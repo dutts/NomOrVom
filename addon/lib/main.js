@@ -5,5 +5,5 @@ pageMod.PageMod({
     include: "http://www.just-eat.co.uk/area/*",
     //include: "http://localhost/*",
     contentScriptOptions: {prefixDataURI: self.data.url("")},
-	contentScriptFile: [self.data.url("jquery-1.11.1.min.js"), self.data.url("api.js")]
+	contentScriptFile: [self.data.url("jquery-2.1.3.min.js"), self.data.url("api.js")]
 });
