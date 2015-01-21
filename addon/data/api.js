@@ -63,6 +63,17 @@ $("article").each(function () {
 				$(resultText).text("Hygiene Score : " + rating + "/5");
 				scorePlaceholder.appendChild(resultText);
 			}
+			else
+			{
+				scorePlaceholder.removeChild(loadingText);
+				scorePlaceholder.removeChild(loaderImg);
+				
+				var resultText = document.createElement('p');
+				resultText.style.fontWeight = "bold";
+				resultText.style.margin = "5px 5px";
+				$(resultText).text("Sorry, no food hygiene data found");
+				scorePlaceholder.appendChild(resultText);
+			}
         },
         error: function (error) { },
         beforeSend: function (xhr) { xhr.setRequestHeader('x-api-version', 2); }
