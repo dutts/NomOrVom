@@ -1,14 +1,9 @@
-// http://www.just-eat.co.uk/area/nn6-creaton
+// toilet-paper-icon_32 from Rokey (http://www.iconarchive.com/show/smooth-icons-by-rokey/toilet-paper-icon.html)
+// 48-fork-and-knife-icon by Glyphish (http://glyphish.com/)
 
 function AppendImg(element, filename) {
     var img = document.createElement('img');
     img.src = self.options.prefixDataURI + filename;
-    element.appendChild(img);
-}
-
-function Thumb(element) {
-    var img = document.createElement('img');
-    img.src = self.options.prefixDataURI + 'good.png';
     element.appendChild(img);
 }
 
@@ -52,10 +47,10 @@ $("article").each(function () {
 				//img.src = self.options.prefixDataURI + rating + '.png';
 				//_this.append(img);
 				for (var i = 0; i < rating; i++) {
-					AppendImg(scorePlaceholder, 'good.png');
+					AppendImg(scorePlaceholder, '48-fork-and-knife-icon.png');
 				}
 				for (var i = 0; i < 5 - rating; i++) {
-					AppendImg(scorePlaceholder, 'poop.png');
+					AppendImg(scorePlaceholder, 'toilet-paper-icon_32.png');
 				}
 				var resultText = document.createElement('p');
 				resultText.style.fontWeight = "bold";
