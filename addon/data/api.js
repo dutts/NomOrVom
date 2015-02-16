@@ -1,5 +1,7 @@
 // toilet-paper-icon_32 from Rokey (http://www.iconarchive.com/show/smooth-icons-by-rokey/toilet-paper-icon.html)
 // 48-fork-and-knife-icon by Glyphish (http://glyphish.com/)
+// test 
+// cfx run --binary-args="-url http://www.just-eat.co.uk/area/nn1-northampton"
 
 function AppendImg(element, filename) {
     var img = document.createElement('img');
@@ -7,7 +9,29 @@ function AppendImg(element, filename) {
     element.appendChild(img);
 }
 
-$("article").each(function () {
+function ApplyFilter(hideLessThanThree, restaurantEntries) {
+	restaurantEntries.each(function () {
+		if (hideLessThanThree && ( $("input.foodgovukscore", this).length && $("input.foodgovukscore", this).attr("value") < 3)) { 
+			$(this).hide();
+		}
+		else { $(this).show(); }
+	});
+}
+
+var restaurantEntries = $("article");
+
+var checkbox = document.createElement('input');
+checkbox.type = "checkbox";
+checkbox.name = "hideLessThanThree";
+$(checkbox).change(function() {
+    ApplyFilter(checkbox.checked, restaurantEntries);
+});
+
+$("div#SearchResults").prepend(checkbox);
+
+$(checkbox).prop('checked', true);
+
+restaurantEntries.each(function () {
     var _this = $(this);
     var name = $("h3.restaurantDetailsName a:first", this).text(); 
     var address = $("address:first", this).text();
@@ -45,18 +69,25 @@ $("article").each(function () {
 				var rating = data.establishments[0].RatingValue;
 				//var img = document.createElement('img');
 				//img.src = self.options.prefixDataURI + rating + '.png';
-				//_this.append(img);
+				//_this.append(img);	
 				for (var i = 0; i < rating; i++) {
 					AppendImg(scorePlaceholder, '48-fork-and-knife-icon.png');
 				}
 				for (var i = 0; i < 5 - rating; i++) {
 					AppendImg(scorePlaceholder, 'toilet-paper-icon_32.png');
 				}
+				var hiddenScore = document.createElement('input');
+				hiddenScore.type = "hidden";
+				hiddenScore.name = "foodgovukscore";
+				hiddenScore.value = rating;
+				scorePlaceholder.appendChild(hiddenScore);
+				
 				var resultText = document.createElement('p');
 				resultText.style.fontWeight = "bold";
 				resultText.style.margin = "0px 5px";
 				$(resultText).text("Hygiene Score : " + rating + "/5");
 				scorePlaceholder.appendChild(resultText);
+				
 			}
 			else
 			{
