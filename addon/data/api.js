@@ -54,11 +54,16 @@ restaurantEntries.each(function () {
 	loadingText.style.padding = "0px 5px";
 	$(loadingText).text("Loading food scores...");
 	
-	var loaderImg = document.createElement('img');
-    loaderImg.src = self.options.prefixDataURI + 'ajax-loader.gif';
-    
+    var loaderImg = document.createElement('div');
+	loaderImg.id = "progressbar";
+	$(loaderImg).progressbar({
+      value: false
+	});
+	
 	scorePlaceholder.appendChild(loadingText);
 	scorePlaceholder.appendChild(loaderImg);
+	
+	$(scorePlaceholder).attr("data-rating", 0);
 	
     _this.append(scorePlaceholder);
 
@@ -97,9 +102,11 @@ restaurantEntries.each(function () {
 				scorePlaceholder.removeChild(loaderImg);
 				
 				var resultText = document.createElement('div');
+				resultText.id = "hygieneScore";
 				resultText.style.fontWeight = "bold";
 				resultText.style.margin = "5px 5px";
 				$(resultText).text("Sorry, no food hygiene data found");
+				
 				scorePlaceholder.appendChild(resultText);
 			}
         },
