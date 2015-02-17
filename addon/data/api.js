@@ -11,8 +11,12 @@ function AppendImg(element, filename) {
 
 function ApplyFilter(hideLessThanThree, restaurantEntries) {
 	restaurantEntries.each(function () {
-		if (hideLessThanThree && ( $("input.foodgovukscore", this).length && $("input.foodgovukscore", this).attr("value") < 3)) { 
-			$(this).hide();
+		if (hideLessThanThree) {
+			var ratingElement = $("div#nomorvom[data-rating]", this);
+			if (ratingElement.length) {
+				var rating = $("div#nomorvom[data-rating]", this).attr("data-rating");
+				if (rating < 3) { $(this).hide(); }
+			}
 		}
 		else { $(this).show(); }
 	});
@@ -39,6 +43,7 @@ restaurantEntries.each(function () {
     var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
 
     var scorePlaceholder = document.createElement('div');
+	scorePlaceholder.id = "nomorvom"
 	scorePlaceholder.style.border = "thin dashed red";
     scorePlaceholder.style.padding = "5px";
 	scorePlaceholder.style.margin = "5px";
@@ -76,25 +81,22 @@ restaurantEntries.each(function () {
 				for (var i = 0; i < 5 - rating; i++) {
 					AppendImg(scorePlaceholder, 'toilet-paper-icon_32.png');
 				}
-				var hiddenScore = document.createElement('input');
-				hiddenScore.type = "hidden";
-				hiddenScore.name = "foodgovukscore";
-				hiddenScore.value = rating;
-				scorePlaceholder.appendChild(hiddenScore);
-				
-				var resultText = document.createElement('p');
+				var resultText = document.createElement('div');
+				resultText.id = "hygieneScore"
 				resultText.style.fontWeight = "bold";
 				resultText.style.margin = "0px 5px";
 				$(resultText).text("Hygiene Score : " + rating + "/5");
+				
 				scorePlaceholder.appendChild(resultText);
 				
+				$(scorePlaceholder).attr("data-rating", rating);
 			}
 			else
 			{
 				scorePlaceholder.removeChild(loadingText);
 				scorePlaceholder.removeChild(loaderImg);
 				
-				var resultText = document.createElement('p');
+				var resultText = document.createElement('div');
 				resultText.style.fontWeight = "bold";
 				resultText.style.margin = "5px 5px";
 				$(resultText).text("Sorry, no food hygiene data found");
