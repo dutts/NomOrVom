@@ -10,14 +10,12 @@ function AppendImg(element, filename) {
 }
 
 function ApplyFilter(ratingFilterRange, restaurantEntries) {
-	console.log(ratingFilterRange);
 	restaurantEntries.each(function () {
 		if (ratingFilterRange[0] > 0 || ratingFilterRange[1] < 5) {
 			var ratingElement = $("div#nomorvom[data-rating]", this);
 			if (ratingElement.length) {
 				var rating = $("div#nomorvom[data-rating]", this).attr("data-rating");
 				if ((rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1])) { 
-					console.log("hiding " + rating);
 					$(this).hide(); 
 				}
 			}
@@ -28,9 +26,21 @@ function ApplyFilter(ratingFilterRange, restaurantEntries) {
 
 var restaurantEntries = $("article");
 
-var minScoreSlider = document.createElement('div');
-minScoreSlider.id = "minScoreSlider";
-$(minScoreSlider).slider({
+var config = document.createElement('div');
+config.id = "nomorvom_config"
+config.style.border = "thin dashed red";
+config.style.padding = "5px 10px 25px 10px";
+config.style.margin = "5px";
+
+var title = document.createElement('p');
+title.id = "nomorvom_config_title";
+title.appendChild(document.createTextNode("Move the sliders to filter results by hygiene rating:"));
+
+config.appendChild(title);
+
+var scoreFilterSlider = document.createElement('div');
+scoreFilterSlider.id = "scoreFilterSlider";
+$(scoreFilterSlider).slider({
 	range: true,
 	values: [0, 5],
 	min: 0,
@@ -48,16 +58,18 @@ $(minScoreSlider).slider({
 //
 
 // Get the number of possible values
-var vals = $(minScoreSlider).slider("option", "max") - $(minScoreSlider).slider("option", "min");
+var vals = $(scoreFilterSlider).slider("option", "max") - $(scoreFilterSlider).slider("option", "min");
 
 // Space out values
 for (var i = 0; i <= vals; i++) {
-	var el = $('<label>'+(i+1)+'</label>').css('left',(i/vals*100)+'%');
+	var el = $('<label>'+(i)+'</label>').css('left',(i/vals*100)+'%');
 
-	$(minScoreSlider).append(el);
+	$(scoreFilterSlider).append(el);
 }
 
-$("div#SearchResults").prepend(minScoreSlider);
+config.appendChild(scoreFilterSlider);
+
+$("div#SearchResults").prepend(config);
 
 restaurantEntries.each(function () {
     var _this = $(this);
@@ -90,6 +102,8 @@ restaurantEntries.each(function () {
 	$(scorePlaceholder).attr("data-rating", 0);
 	
     _this.append(scorePlaceholder);
+    
+    var rating = 0;
 
     $.ajax({
         url: url,
@@ -100,7 +114,7 @@ restaurantEntries.each(function () {
 			if (data.establishments.length > 0) {
 				scorePlaceholder.removeChild(loadingText);
 				scorePlaceholder.removeChild(loaderImg);
-				var rating = data.establishments[0].RatingValue;	
+				rating = data.establishments[0].RatingValue;	
 				for (var i = 0; i < rating; i++) {
 					AppendImg(scorePlaceholder, '48-fork-and-knife-icon.png');
 				}
@@ -131,7 +145,7 @@ restaurantEntries.each(function () {
 				scorePlaceholder.appendChild(resultText);
 			}
 			
-			var ratingFilterRange = $(minScoreSlider).slider("values");
+			var ratingFilterRange = $(scoreFilterSlider).slider("values");
 			if ((rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1])) {
 				_this.hide();
 			}
