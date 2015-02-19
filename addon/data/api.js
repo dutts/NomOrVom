@@ -9,13 +9,17 @@ function AppendImg(element, filename) {
     element.appendChild(img);
 }
 
-function ApplyFilter(hideLessThanThree, restaurantEntries) {
+function ApplyFilter(ratingFilterRange, restaurantEntries) {
+	console.log(ratingFilterRange);
 	restaurantEntries.each(function () {
-		if (hideLessThanThree) {
+		if (ratingFilterRange[0] > 0 || ratingFilterRange[1] < 5) {
 			var ratingElement = $("div#nomorvom[data-rating]", this);
 			if (ratingElement.length) {
 				var rating = $("div#nomorvom[data-rating]", this).attr("data-rating");
-				if (rating < 3) { $(this).hide(); }
+				if ((rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1])) { 
+					console.log("hiding " + rating);
+					$(this).hide(); 
+				}
 			}
 		}
 		else { $(this).show(); }
@@ -24,16 +28,20 @@ function ApplyFilter(hideLessThanThree, restaurantEntries) {
 
 var restaurantEntries = $("article");
 
-var checkbox = document.createElement('input');
-checkbox.type = "checkbox";
-checkbox.name = "hideLessThanThree";
-$(checkbox).change(function() {
-    ApplyFilter(checkbox.checked, restaurantEntries);
+var minScoreSlider = document.createElement('div');
+minScoreSlider.name = "minScoreSlider";
+$(minScoreSlider).slider({
+	range: true,
+	values: [0, 5],
+	min: 0,
+	max: 5,
+	step: 1,
+	slide: function( event, ui ) {
+		ApplyFilter(ui.values, restaurantEntries);
+	}
 });
 
-$("div#SearchResults").prepend(checkbox);
-
-$(checkbox).prop('checked', true);
+$("div#SearchResults").prepend(minScoreSlider);
 
 restaurantEntries.each(function () {
     var _this = $(this);
@@ -76,10 +84,7 @@ restaurantEntries.each(function () {
 			if (data.establishments.length > 0) {
 				scorePlaceholder.removeChild(loadingText);
 				scorePlaceholder.removeChild(loaderImg);
-				var rating = data.establishments[0].RatingValue;
-				//var img = document.createElement('img');
-				//img.src = self.options.prefixDataURI + rating + '.png';
-				//_this.append(img);	
+				var rating = data.establishments[0].RatingValue;	
 				for (var i = 0; i < rating; i++) {
 					AppendImg(scorePlaceholder, '48-fork-and-knife-icon.png');
 				}
@@ -108,6 +113,15 @@ restaurantEntries.each(function () {
 				$(resultText).text("Sorry, no food hygiene data found");
 				
 				scorePlaceholder.appendChild(resultText);
+			}
+			
+			var ratingFilterRange = $(minScoreSlider).slider("values");
+			if ((rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1])) {
+				_this.hide();
+			}
+			else
+			{
+				_this.show();
 			}
         },
         error: function (error) { },
