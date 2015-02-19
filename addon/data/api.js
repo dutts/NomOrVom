@@ -29,7 +29,7 @@ function ApplyFilter(ratingFilterRange, restaurantEntries) {
 var restaurantEntries = $("article");
 
 var minScoreSlider = document.createElement('div');
-minScoreSlider.name = "minScoreSlider";
+minScoreSlider.id = "minScoreSlider";
 $(minScoreSlider).slider({
 	range: true,
 	values: [0, 5],
@@ -39,7 +39,23 @@ $(minScoreSlider).slider({
 	slide: function( event, ui ) {
 		ApplyFilter(ui.values, restaurantEntries);
 	}
-});
+})
+
+//
+// Add labels to slider whose values 
+// are specified by min, max and whose
+// step is set to 1
+//
+
+// Get the number of possible values
+var vals = $(minScoreSlider).slider("option", "max") - $(minScoreSlider).slider("option", "min");
+
+// Space out values
+for (var i = 0; i <= vals; i++) {
+	var el = $('<label>'+(i+1)+'</label>').css('left',(i/vals*100)+'%');
+
+	$(minScoreSlider).append(el);
+}
 
 $("div#SearchResults").prepend(minScoreSlider);
 
