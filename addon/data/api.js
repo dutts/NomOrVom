@@ -24,7 +24,7 @@ function ApplyFilter(ratingFilterRange, restaurantEntries) {
 	});
 }
 
-var restaurantEntries = $("article");
+var restaurantEntries = $("div.restaurant");
 
 var config = document.createElement('div');
 config.id = "nomorvom_config"
@@ -69,12 +69,12 @@ for (var i = 0; i <= vals; i++) {
 
 config.appendChild(scoreFilterSlider);
 
-$("div#SearchResults").prepend(config);
+$("div.restaurants").prepend(config);
 
 restaurantEntries.each(function () {
     var _this = $(this);
-    var name = $("h3.restaurantDetailsName a:first", this).text(); 
-    var address = $("address:first", this).text();
+    var name = $("h2.name a:first", this).text().trim(); 
+    var address = $("p.address:first", this).text().trim();
 
     var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
 
