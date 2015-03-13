@@ -9,15 +9,14 @@ function AppendImg(element, filename) {
     element.appendChild(img);
 }
 
-function ApplyFilter(ratingFilterRange, restaurantEntries) {
+function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
+	excludeNoData = typeof excludeNoData !== 'undefined' ? excludeNoData : true;
 	restaurantEntries.each(function () {
-		if (ratingFilterRange[0] > 0 || ratingFilterRange[1] < 5) {
-			var ratingElement = $("div#nomorvom[data-rating]", this);
-			if (ratingElement.length) {
-				var rating = $("div#nomorvom[data-rating]", this).attr("data-rating");
-				if ((rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1])) { 
-					$(this).hide(); 
-				}
+		var ratingElement = $("div#nomorvom[data-rating]", this);
+		if (ratingElement.length) {
+			var rating = $("div#nomorvom[data-rating]", this).attr("data-rating");
+			if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
+				$(this).hide(); 
 			}
 		}
 		else { $(this).show(); }
@@ -32,11 +31,10 @@ config.style.border = "thin dashed red";
 config.style.padding = "5px 10px 25px 10px";
 config.style.margin = "5px";
 
-var title = document.createElement('p');
-title.id = "nomorvom_config_title";
-title.appendChild(document.createTextNode("Move the sliders to filter results by hygiene rating:"));
-
-config.appendChild(title);
+var sliderLabel = document.createElement('p');
+sliderLabel.id = "nomorvom_config_title";
+sliderLabel.appendChild(document.createTextNode("Move the sliders to filter results by hygiene rating:"));
+config.appendChild(sliderLabel);
 
 var scoreFilterSlider = document.createElement('div');
 scoreFilterSlider.id = "scoreFilterSlider";
@@ -49,7 +47,7 @@ $(scoreFilterSlider).slider({
 	slide: function( event, ui ) {
 		ApplyFilter(ui.values, restaurantEntries);
 	}
-})
+});
 
 //
 // Add labels to slider whose values 
@@ -68,6 +66,22 @@ for (var i = 0; i <= vals; i++) {
 }
 
 config.appendChild(scoreFilterSlider);
+
+var excludeNoDataLabel = document.createElement('p');
+excludeNoDataLabel.id = "nomorvom_config_title";
+excludeNoDataLabel.style.padding = "20px 0px";
+excludeNoDataLabel.appendChild(document.createTextNode("Exclude 'No Result' Entries:"));
+
+var excludeNoDataCheckbox = document.createElement('input');
+excludeNoDataCheckbox.type = "checkbox"
+excludeNoDataCheckbox.id = "nomorvom_config_excludeNoData";
+$(excludeNoDataCheckbox).prop('checked', true);
+$(excludeNoDataCheckbox).change(function() {
+	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, $(excludeNoDataCheckbox).prop('checked'));
+});
+excludeNoDataLabel.appendChild(excludeNoDataCheckbox);
+
+config.appendChild(excludeNoDataLabel);
 
 $("div.restaurants").prepend(config);
 
@@ -103,7 +117,7 @@ restaurantEntries.each(function () {
 	
     _this.append(scorePlaceholder);
     
-    var rating = 0;
+    var rating = -1;
 
     $.ajax({
         url: url,
@@ -143,10 +157,13 @@ restaurantEntries.each(function () {
 				$(resultText).text("Sorry, no food hygiene data found");
 				
 				scorePlaceholder.appendChild(resultText);
+
+				$(scorePlaceholder).attr("data-rating", rating);
 			}
 			
 			var ratingFilterRange = $(scoreFilterSlider).slider("values");
-			if ((rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1])) {
+			var excludeNoData =  $(excludeNoDataCheckbox).prop('checked');
+			if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
 				_this.hide();
 			}
 			else
