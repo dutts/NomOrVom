@@ -81,14 +81,19 @@ $(excludeNoDataCheckbox).change(function() {
 });
 excludeNoDataLabel.appendChild(excludeNoDataCheckbox);
 
-config.appendChild(excludeNoDataLabel);
+//config.appendChild(excludeNoDataLabel);
 
 $("div.restaurants").prepend(config);
 
 restaurantEntries.each(function () {
     var _this = $(this);
     var name = $("h2.name a:first", this).text().trim(); 
-    var address = $("p.address:first", this).text().trim();
+    var address = $("p.address:first", this)
+    	.clone()
+    	.children()
+    	.remove()
+    	.end()
+    	.text().trim();
 
     var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
 
