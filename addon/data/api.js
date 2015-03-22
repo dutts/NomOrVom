@@ -86,7 +86,6 @@ excludeNoDataLabel.appendChild(excludeNoDataCheckbox);
 $("div.restaurants").prepend(config);
 
 restaurantEntries.each(function () {
-    alert("foo");
     var _this = $(this);
     var name = $("h2.name a:first", this).text().trim(); 
     var address = $("p.address:first", this)
