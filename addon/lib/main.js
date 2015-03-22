@@ -2,7 +2,7 @@ var pageMod = require("sdk/page-mod");
 var self = require("sdk/self");
 
 pageMod.PageMod({
-    include: "http://www.just-eat.co.uk/area/*",
+    include: ["http://www.just-eat.co.uk/area/*", "http://just-eat.co.uk/area/*"],
     //include: "http://localhost/*",
 	contentStyleFile: [self.data.url("jquery-ui-1.11.4/jquery-ui.min.css"), self.data.url("nomorvom.css")],
     contentScriptOptions: {prefixDataURI: self.data.url("")},
