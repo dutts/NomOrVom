@@ -15,9 +15,11 @@ function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
 		var ratingElement = $("div#nomorvom[data-rating]", this);
 		if (ratingElement.length) {
 			var rating = $("div#nomorvom[data-rating]", this).attr("data-rating");
-			if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
+			//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
+			if ( (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
 				$(this).hide(); 
 			}
+			else { $(this).show(); }
 		}
 		else { $(this).show(); }
 	});
@@ -122,7 +124,7 @@ restaurantEntries.each(function () {
 	
     _this.append(scorePlaceholder);
     
-    var rating = -1;
+    var rating = 0;
 
     $.ajax({
         url: url,
@@ -133,7 +135,7 @@ restaurantEntries.each(function () {
 			if (data.establishments.length > 0) {
 				scorePlaceholder.removeChild(loadingText);
 				scorePlaceholder.removeChild(loaderImg);
-				rating = data.establishments[0].RatingValue;	
+				rating = data.establishments[0].RatingValue;
 				for (var i = 0; i < rating; i++) {
 					AppendImg(scorePlaceholder, '48-fork-and-knife-icon.png');
 				}
@@ -144,8 +146,15 @@ restaurantEntries.each(function () {
 				resultText.id = "hygieneScore"
 				resultText.style.fontWeight = "bold";
 				resultText.style.margin = "0px 5px";
-				$(resultText).text("Hygiene Score : " + rating + "/5");
-				
+
+
+				if (rating == "AwaitingInspection") {
+					$(resultText).text("This takeaway is awaiting inspection");					
+					rating = 0;
+				}	
+				else {
+					$(resultText).text("Hygiene Score : " + rating + "/5");
+				}
 				scorePlaceholder.appendChild(resultText);
 				
 				$(scorePlaceholder).attr("data-rating", rating);
@@ -167,8 +176,9 @@ restaurantEntries.each(function () {
 			}
 			
 			var ratingFilterRange = $(scoreFilterSlider).slider("values");
-			var excludeNoData =  $(excludeNoDataCheckbox).prop('checked');
-			if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
+			//var excludeNoData =  $(excludeNoDataCheckbox).prop('checked');
+			//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
+			if ((rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1])) { 
 				_this.hide();
 			}
 			else
