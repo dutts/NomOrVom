@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "NomOrVom",
+  "version": "0.13",
+  "description": "How clean is your takeaway? Never eat from a dodgy takeaway again. Food.gov.uk hygiene scores in your Just Eat search results",
+  "author": "Richard Dutton",
+  "icons": { "32": "toilet-paper-icon_32.png",
+			 "48": "toilet-paper-icon_48.png",
+			 "64": "toilet-paper-icon_64.png"},
+  "content_scripts": [
+    {
+      "matches": ["http://www.just-eat.co.uk/area/*", "http://just-eat.co.uk/area/*"],
+      "css": ["jquery-ui-1.11.4/jquery-ui.min.css", "nomorvom.css"],
+      "js": ["jquery-2.1.3/jquery-2.1.3.min.js", "jquery-ui-1.11.4/jquery-ui.min.js", "api.js"],
+      "run_at": "document_end"
+     }
+  ],
+  "web_accessible_resources": ["48-fork-and-knife-icon.png","toilet-paper-icon_32.png"]
+}
