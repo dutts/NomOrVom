@@ -5,7 +5,7 @@
 
 function AppendImg(element, filename) {
     var img = document.createElement('img');
-    img.src = self.options.prefixDataURI + filename;
+    img.src = chrome.extension.getURL('img' + filename);
     element.appendChild(img);
 }
 
