@@ -3,7 +3,7 @@
   "version": "0.13",
   "manifest_version": 2,
   "description": "Never eat from a dodgy takeaway again. Display food.gov.uk food hygiene scores in your Just Eat search results.",
-  "homepage_url": "http://extensionizr.com",
+  "homepage_url": "https://github.com/dutts/NomOrVom/",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -20,7 +20,6 @@
         "http://*.just-eat.co.uk/area/*"
       ],
       "js": [
-        "src/inject/inject.js",
 		"js/jquery/jquery.min.js",
 		"js/jquery-ui/jquery-ui.min.js",
 		"js/api.js"
