@@ -1,0 +1,15 @@
+#scoreFilterSlider label {
+    position: absolute;
+    width: 20px;
+    margin-left: -10px;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+#nomorvom_config_title {
+	font-weight: bold;
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
