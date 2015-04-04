@@ -15,21 +15,21 @@ function startListening(worker) {
 		console.log(restaurant);
 		
 		var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(restaurant.name) + "&address=" + encodeURIComponent(restaurant.address); 
+		var rating = 0;
 
 		var Request = require("sdk/request").Request;
 		var foodLookupRequest = Request({
   			url: url,
   			headers: {'x-api-version':2, 'Content-Type':'application/json', 'Accept':'application/json'},
 			onComplete: function (response) {	
-				console.log(response);
+				//console.log(response);
 				if (response.json != null) {
-					console.log(response.json.data.establishments.length);
-					if (response.json.data.establishments.length > 0) {
-						rating = response.json.data.establishments[0].RatingValue;
-						console.log(rating);
+					//console.log(response.json);
+					if (response.json.establishments.length > 0) {
+						rating = response.json.establishments[0].RatingValue;
 					}
 				}
-				//worker.port.emit("restaurantScore", rating);
+				worker.port.emit("restaurantScore", {id:restaurant.id, rating:rating});
 			}
 		}).get();
 	});	

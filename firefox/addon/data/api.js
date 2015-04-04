@@ -6,7 +6,7 @@
 function AppendImg(element, filename) {
     var img = document.createElement('img');
     img.src = self.options.prefixDataURI + filename;
-    element.appendChild(img);
+    element.append(img);
 }
 
 function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
@@ -87,6 +87,40 @@ excludeNoDataLabel.appendChild(excludeNoDataCheckbox);
 
 $("div.restaurants").prepend(config);
 
+// Set up the listener for the result returned from the addon script
+self.port.on("restaurantScore", function(restaurantScore) {
+	console.log("id " + restaurantScore.id + ", rating " + restaurantScore.rating);
+	// find the score placeholder for the restaurant we've got a result for
+	var restaurantScorePlaceholder = $("div#nomorvom[data-nomorvom-id='"+restaurantScore.id+"']");
+	restaurantScorePlaceholder.attr("data-rating", restaurantScore.rating);
+	$("p#nomorvom_loading", restaurantScorePlaceholder).remove();
+	$("div#nomorvom_progressbar", restaurantScorePlaceholder).remove();
+	
+	for (var i = 0; i < restaurantScore.rating; i++) {
+		AppendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
+	}
+	for (var i = 0; i < 5 - restaurantScore.rating; i++) {
+		AppendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
+	}
+	
+	var resultText = document.createElement('div');
+	resultText.id = "hygieneScore"
+	resultText.style.fontWeight = "bold";
+	resultText.style.margin = "0px 5px";
+
+	if (restaurantScore.rating == "AwaitingInspection") {
+		$(resultText).text("This takeaway is awaiting inspection");					
+		restaurantScore.rating = 0;
+	}	
+	else {
+		$(resultText).text("Hygiene Score : " + restaurantScore.rating + "/5");
+	}
+	restaurantScorePlaceholder.append(resultText);
+});
+
+
+var restaurantId = 0;
+
 restaurantEntries.each(function () {
     var _this = $(this);
     var name = $("h2.name a:first", this).text().trim(); 
@@ -97,25 +131,25 @@ restaurantEntries.each(function () {
     	.end()
     	.text().trim();
 
-    self.port.emit("queryRestaurant", {name:name, address:address});
+    self.port.emit("queryRestaurant", {id:restaurantId, name:name, address:address});
 
-
-    var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
+//    var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
 
     var scorePlaceholder = document.createElement('div');
-	scorePlaceholder.id = "nomorvom"
+	scorePlaceholder.id = "nomorvom";
 	scorePlaceholder.style.border = "thin dashed red";
     scorePlaceholder.style.padding = "5px";
 	scorePlaceholder.style.margin = "5px";
 	scorePlaceholder.width = "50%";
 	
 	var loadingText = document.createElement('p');
+	loadingText.id = "nomorvom_loading";
 	loadingText.style.fontWeight = "bold";
 	loadingText.style.padding = "0px 5px";
 	$(loadingText).text("Loading food scores...");
 	
     var loaderImg = document.createElement('div');
-	loaderImg.id = "progressbar";
+	loaderImg.id = "nomorvom_progressbar";
 	$(loaderImg).progressbar({
       value: false
 	});
@@ -124,9 +158,16 @@ restaurantEntries.each(function () {
 	scorePlaceholder.appendChild(loaderImg);
 	
 	$(scorePlaceholder).attr("data-rating", 0);
-	
+
+	$(scorePlaceholder).attr("data-nomorvom-id", restaurantId);
+
     _this.append(scorePlaceholder);
     
+    restaurantId++;
+
+
+
+/*
     var rating = 0;
 
     $.ajax({
@@ -192,4 +233,5 @@ restaurantEntries.each(function () {
         error: function (error) { },
         beforeSend: function (xhr) { xhr.setRequestHeader('x-api-version', 2); }
     });
+*/
 });
