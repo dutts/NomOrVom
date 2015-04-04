@@ -91,18 +91,20 @@ $("div.restaurants").prepend(config);
 self.port.on("restaurantScore", function(restaurantScore) {
 	console.log("id " + restaurantScore.id + ", rating " + restaurantScore.rating);
 	// find the score placeholder for the restaurant we've got a result for
-	var restaurantScorePlaceholder = $("div#nomorvom[data-nomorvom-id='"+restaurantScore.id+"']");
+	var restaurantScorePlaceholder = $("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
 	restaurantScorePlaceholder.attr("data-rating", restaurantScore.rating);
 	$("p#nomorvom_loading", restaurantScorePlaceholder).remove();
 	$("div#nomorvom_progressbar", restaurantScorePlaceholder).remove();
 	
-	for (var i = 0; i < restaurantScore.rating; i++) {
-		AppendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
+	if (restaurantScore.rating > 0) {
+		for (var i = 0; i < restaurantScore.rating; i++) {
+			AppendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
+		}
+		for (var i = 0; i < 5 - restaurantScore.rating; i++) {
+			AppendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
+		}
 	}
-	for (var i = 0; i < 5 - restaurantScore.rating; i++) {
-		AppendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
-	}
-	
+
 	var resultText = document.createElement('div');
 	resultText.id = "hygieneScore"
 	resultText.style.fontWeight = "bold";
@@ -113,9 +115,27 @@ self.port.on("restaurantScore", function(restaurantScore) {
 		restaurantScore.rating = 0;
 	}	
 	else {
-		$(resultText).text("Hygiene Score : " + restaurantScore.rating + "/5");
+		if (restaurantScore.rating == -1) {
+			$(resultText).text("Sorry, no food hygiene data found");
+		}
+		else {
+			$(resultText).text("Hygiene Score : " + restaurantScore.rating + "/5");
+		}
 	}
 	restaurantScorePlaceholder.append(resultText);
+
+	// Filter accordingly
+	var ratingFilterRange = $(scoreFilterSlider).slider("values");
+	//var excludeNoData =  $(excludeNoDataCheckbox).prop('checked');
+	//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
+	if ((restaurantScore.rating < ratingFilterRange[0]) || (restaurantScore.rating > ratingFilterRange[1])) { 
+		$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"']").hide();
+	}
+	else
+	{
+		$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"']").show();
+	}
+
 });
 
 
@@ -161,11 +181,12 @@ restaurantEntries.each(function () {
 
 	$(scorePlaceholder).attr("data-nomorvom-id", restaurantId);
 
+	// Use this in future, but currently in for filtering
+	_this.attr("data-nomorvom-id", restaurantId);
+
     _this.append(scorePlaceholder);
     
     restaurantId++;
-
-
 
 /*
     var rating = 0;

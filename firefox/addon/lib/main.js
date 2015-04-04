@@ -2,7 +2,7 @@ var pageMod = require("sdk/page-mod");
 var self = require("sdk/self");
 
 pageMod.PageMod({
-    include: ["http://www.just-eat.co.uk/area/*", "http://just-eat.co.uk/area/*"],
+    include: ["http://www.just-eat.co.uk/area/*", "http://just-eat.co.uk/area/*", "https://www.just-eat.co.uk/area/*", "https://just-eat.co.uk/area/*"],
  	contentStyleFile: [self.data.url("jquery-ui-1.11.4/jquery-ui.min.css"), self.data.url("nomorvom.css")],
     contentScriptOptions: {prefixDataURI: self.data.url("")},
 	contentScriptFile: [self.data.url("jquery-2.1.3/jquery-2.1.3.min.js"), self.data.url("jquery-ui-1.11.4/jquery-ui.min.js"), self.data.url("api.js")],
@@ -27,6 +27,9 @@ function startListening(worker) {
 					//console.log(response.json);
 					if (response.json.establishments.length > 0) {
 						rating = response.json.establishments[0].RatingValue;
+					} 
+					else {
+						rating = -1;
 					}
 				}
 				worker.port.emit("restaurantScore", {id:restaurant.id, rating:rating});
