@@ -97,6 +97,9 @@ restaurantEntries.each(function () {
     	.end()
     	.text().trim();
 
+    self.port.emit("queryRestaurant", {name:name, address:address});
+
+
     var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
 
     var scorePlaceholder = document.createElement('div');
