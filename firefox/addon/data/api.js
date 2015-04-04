@@ -179,80 +179,9 @@ restaurantEntries.each(function () {
 	
 	$(scorePlaceholder).attr("data-rating", 0);
 
-	$(scorePlaceholder).attr("data-nomorvom-id", restaurantId);
-
-	// Use this in future, but currently in for filtering
 	_this.attr("data-nomorvom-id", restaurantId);
 
     _this.append(scorePlaceholder);
     
     restaurantId++;
-
-/*
-    var rating = 0;
-
-    $.ajax({
-        url: url,
-        type: 'GET',
-        dataType: 'json',
-        cache: false,
-        success: function (data, status) {
-			if (data.establishments.length > 0) {
-				scorePlaceholder.removeChild(loadingText);
-				scorePlaceholder.removeChild(loaderImg);
-				rating = data.establishments[0].RatingValue;
-				for (var i = 0; i < rating; i++) {
-					AppendImg(scorePlaceholder, '48-fork-and-knife-icon.png');
-				}
-				for (var i = 0; i < 5 - rating; i++) {
-					AppendImg(scorePlaceholder, 'toilet-paper-icon_32.png');
-				}
-				var resultText = document.createElement('div');
-				resultText.id = "hygieneScore"
-				resultText.style.fontWeight = "bold";
-				resultText.style.margin = "0px 5px";
-
-
-				if (rating == "AwaitingInspection") {
-					$(resultText).text("This takeaway is awaiting inspection");					
-					rating = 0;
-				}	
-				else {
-					$(resultText).text("Hygiene Score : " + rating + "/5");
-				}
-				scorePlaceholder.appendChild(resultText);
-				
-				$(scorePlaceholder).attr("data-rating", rating);
-			}
-			else
-			{
-				scorePlaceholder.removeChild(loadingText);
-				scorePlaceholder.removeChild(loaderImg);
-				
-				var resultText = document.createElement('div');
-				resultText.id = "hygieneScore";
-				resultText.style.fontWeight = "bold";
-				resultText.style.margin = "5px 5px";
-				$(resultText).text("Sorry, no food hygiene data found");
-				
-				scorePlaceholder.appendChild(resultText);
-
-				$(scorePlaceholder).attr("data-rating", rating);
-			}
-			
-			var ratingFilterRange = $(scoreFilterSlider).slider("values");
-			//var excludeNoData =  $(excludeNoDataCheckbox).prop('checked');
-			//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
-			if ((rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1])) { 
-				_this.hide();
-			}
-			else
-			{
-				_this.show();
-			}
-        },
-        error: function (error) { },
-        beforeSend: function (xhr) { xhr.setRequestHeader('x-api-version', 2); }
-    });
-*/
 });
