@@ -89,7 +89,7 @@ $("div.restaurants").prepend(config);
 
 // Set up the listener for the result returned from the addon script
 self.port.on("restaurantScore", function(restaurantScore) {
-	console.log("id " + restaurantScore.id + ", rating " + restaurantScore.rating);
+	//console.log("id " + restaurantScore.id + ", rating " + restaurantScore.rating);
 	// find the score placeholder for the restaurant we've got a result for
 	var restaurantScorePlaceholder = $("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
 	restaurantScorePlaceholder.attr("data-rating", restaurantScore.rating);
