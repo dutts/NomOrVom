@@ -17,11 +17,11 @@ function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
 			var rating = $("div#nomorvom[data-rating]", el).attr("data-rating");
 			//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
 			if ( (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
-				$(el).hide(); 
+				el.style.display = 'none'; 
 			}
-			else { $(el).show(); }
+			else { el.style.display = ''; }
 		}
-		else { $(el).show(); }
+		else { el.style.display = ''; }
 	});
 }
 
@@ -142,13 +142,11 @@ self.port.on("restaurantScore", function(restaurantScore) {
 var restaurantId = 0;
 
 Array.prototype.forEach.call(restaurantEntries, function (el, i) {
-    var _this = $(el);
+
     var name = el.querySelector('h2.name a').textContent.trim(); 
     var address = el.querySelector('p.address').childNodes[0].textContent.trim();
 
     self.port.emit("queryRestaurant", {id:restaurantId, name:name, address:address});
-
-//    var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
 
     var scorePlaceholder = document.createElement('div');
 	scorePlaceholder.id = "nomorvom";
@@ -161,7 +159,7 @@ Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 	loadingText.id = "nomorvom_loading";
 	loadingText.style.fontWeight = "bold";
 	loadingText.style.padding = "0px 5px";
-	$(loadingText).text("Loading food scores...");
+	loadingText.textContent = "Loading food scores...";
 	
     var loaderImg = document.createElement('div');
 	loaderImg.id = "nomorvom_progressbar";
@@ -172,11 +170,11 @@ Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 	scorePlaceholder.appendChild(loadingText);
 	scorePlaceholder.appendChild(loaderImg);
 	
-	$(scorePlaceholder).attr("data-rating", 0);
+	scorePlaceholder.setAttribute('data-rating', 0);
 
-	_this.attr("data-nomorvom-id", restaurantId);
+	el.setAttribute('data-nomorvom-id', restaurantId);
 
-    _this.append(scorePlaceholder);
+    el.appendChild(scorePlaceholder);
     
     restaurantId++;
 });
