@@ -11,21 +11,21 @@ function AppendImg(element, filename) {
 
 function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
 	excludeNoData = typeof excludeNoData !== 'undefined' ? excludeNoData : true;
-	restaurantEntries.each(function () {
-		var ratingElement = $("div#nomorvom[data-rating]", this);
+	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
+		var ratingElement = $("div#nomorvom[data-rating]", el);
 		if (ratingElement.length) {
-			var rating = $("div#nomorvom[data-rating]", this).attr("data-rating");
+			var rating = $("div#nomorvom[data-rating]", el).attr("data-rating");
 			//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
 			if ( (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
-				$(this).hide(); 
+				$(el).hide(); 
 			}
-			else { $(this).show(); }
+			else { $(el).show(); }
 		}
-		else { $(this).show(); }
+		else { $(el).show(); }
 	});
 }
 
-var restaurantEntries = $("div.restaurant");
+var restaurantEntries = document.querySelectorAll('div.restaurant');
 
 var config = document.createElement('div');
 config.id = "nomorvom_config"
@@ -141,10 +141,10 @@ self.port.on("restaurantScore", function(restaurantScore) {
 
 var restaurantId = 0;
 
-restaurantEntries.each(function () {
-    var _this = $(this);
-    var name = $("h2.name a:first", this).text().trim(); 
-    var address = $("p.address:first", this)
+Array.prototype.forEach.call(restaurantEntries, function (el, i) {
+    var _this = $(el);
+    var name = $("h2.name a:first", el).text().trim(); 
+    var address = $("p.address:first", el)
     	.clone()
     	.children()
     	.remove()
