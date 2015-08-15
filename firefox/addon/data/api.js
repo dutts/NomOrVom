@@ -143,13 +143,8 @@ var restaurantId = 0;
 
 Array.prototype.forEach.call(restaurantEntries, function (el, i) {
     var _this = $(el);
-    var name = $("h2.name a:first", el).text().trim(); 
-    var address = $("p.address:first", el)
-    	.clone()
-    	.children()
-    	.remove()
-    	.end()
-    	.text().trim();
+    var name = el.querySelector('h2.name a').textContent.trim(); 
+    var address = el.querySelector('p.address').childNodes[0].textContent.trim();
 
     self.port.emit("queryRestaurant", {id:restaurantId, name:name, address:address});
 
