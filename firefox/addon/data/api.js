@@ -25,7 +25,7 @@ function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
 	});
 }
 
-var restaurantEntries = document.querySelectorAll('div.restaurant');
+var restaurantEntries = document.querySelectorAll('div.restaurant:not(.offlineRestaurant)');
 
 var config = document.createElement('div');
 config.id = "nomorvom_config"
