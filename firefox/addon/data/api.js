@@ -133,17 +133,7 @@ self.port.on("restaurantScore", function(restaurantScore) {
 	restaurantScorePlaceholder.append(resultText);
 
 	// Filter accordingly
-	var ratingFilterRange = $(scoreFilterSlider).slider("values");
-	//var excludeNoData =  $(excludeNoDataCheckbox).prop('checked');
-	//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
-	if ((restaurantScore.rating < ratingFilterRange[0]) || (restaurantScore.rating > ratingFilterRange[1])) { 
-		$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"']").hide();
-	}
-	else
-	{
-		$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"']").show();
-	}
-
+	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, $(excludeNoDataCheckbox).prop('checked'));
 });
 
 
