@@ -3,6 +3,14 @@
 // test 
 // jpm run --binary-args http://www.just-eat.co.uk/area/nn1-northampton
 
+function ShowElement(element) {
+	element.style.display = 'none';
+}
+
+function HideElement(element) {
+	element.style.display = '';
+}
+
 function AppendImg(element, filename) {
     var img = document.createElement('img');
     img.src = self.options.prefixDataURI + filename;
@@ -17,11 +25,11 @@ function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
 			var rating = ratingElement[0].getAttribute('data-rating');
 			//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
 			if ( (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
-				el.style.display = 'none'; 
+				ShowElement(el); 
 			}
-			else { el.style.display = ''; }
+			else { HideElement(el); }
 		}
-		else { el.style.display = ''; }
+		else { HideElement(el); }
 	});
 }
 
