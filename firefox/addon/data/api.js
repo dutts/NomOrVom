@@ -1,7 +1,7 @@
 // toilet-paper-icon_32 from Rokey (http://www.iconarchive.com/show/smooth-icons-by-rokey/toilet-paper-icon.html)
 // 48-fork-and-knife-icon by Glyphish (http://glyphish.com/)
 // test 
-// cfx run --binary-args="-url http://www.just-eat.co.uk/area/nn1-northampton"
+// jpm run --binary-args http://www.just-eat.co.uk/area/nn1-northampton
 
 function AppendImg(element, filename) {
     var img = document.createElement('img');
@@ -12,9 +12,9 @@ function AppendImg(element, filename) {
 function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
 	excludeNoData = typeof excludeNoData !== 'undefined' ? excludeNoData : true;
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
-		var ratingElement = $("div#nomorvom[data-rating]", el);
+		var ratingElement = el.querySelectorAll('div#nomorvom[data-rating]');
 		if (ratingElement.length) {
-			var rating = $("div#nomorvom[data-rating]", el).attr("data-rating");
+			var rating = ratingElement[0].getAttribute('data-rating');
 			//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
 			if ( (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
 				el.style.display = 'none'; 
