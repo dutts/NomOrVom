@@ -3,9 +3,9 @@ var self = require("sdk/self");
 
 pageMod.PageMod({
     include: ["http://www.just-eat.co.uk/area/*", "http://just-eat.co.uk/area/*", "https://www.just-eat.co.uk/area/*", "https://just-eat.co.uk/area/*"],
- 	contentStyleFile: [self.data.url("jquery-ui-1.11.4/jquery-ui.min.css"), self.data.url("nomorvom.css")],
+ 	contentStyleFile: [self.data.url("jquery-ui-1.11.4/jquery-ui.min.css"), self.data.url("noUiSlider-8.0.2/nouislider.css"), self.data.url("nomorvom.css")],
     contentScriptOptions: {prefixDataURI: self.data.url("")},
-	contentScriptFile: [self.data.url("jquery-2.1.4/jquery-2.1.4.min.js"), self.data.url("jquery-ui-1.11.4/jquery-ui.min.js"), self.data.url("api.js")],
+	contentScriptFile: [self.data.url("jquery-2.1.4/jquery-2.1.4.min.js"), self.data.url("noUiSlider-8.0.2/nouislider.js"), self.data.url("jquery-ui-1.11.4/jquery-ui.min.js"), self.data.url("api.js")],
 	contentScriptWhen: "ready",
 	onAttach: startListening
 });
