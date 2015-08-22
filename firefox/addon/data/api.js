@@ -40,13 +40,13 @@ config.id = "nomorvom_config"
 config.style.border = "thin dashed red";
 config.style.padding = "5px 10px 25px 10px";
 config.style.margin = "5px";
-config.style.height = "500px";
 
 var sliderLabel = document.createElement('p');
 sliderLabel.id = "nomorvom_config_title";
 sliderLabel.appendChild(document.createTextNode("Move the sliders to filter results by hygiene rating:"));
 config.appendChild(sliderLabel);
 
+/*
 var scoreFilterSlider2 = document.createElement('div');
 scoreFilterSlider2.id = "scoreFilter";
 
@@ -64,8 +64,12 @@ noUiSlider.create(scoreFilterSlider2, {
 		'min' : 0,
 		'max' : 5
 	}
-});
-/*$(scoreFilterSlider).slider({
+});*/
+
+var scoreFilterSlider = document.createElement('div');
+scoreFilterSlider.id = "scoreFilter";
+
+$(scoreFilterSlider).slider({
 	range: true,
 	values: [0, 5],
 	min: 0,
@@ -74,7 +78,7 @@ noUiSlider.create(scoreFilterSlider2, {
 	slide: function( event, ui ) {
 		ApplyFilter(ui.values, restaurantEntries);
 	}
-});*/
+});
 
 //
 // Add labels to slider whose values 
@@ -83,16 +87,16 @@ noUiSlider.create(scoreFilterSlider2, {
 //
 
 // Get the number of possible values
-//var vals = $(scoreFilterSlider).slider("option", "max") - $(scoreFilterSlider).slider("option", "min");
+var vals = $(scoreFilterSlider).slider("option", "max") - $(scoreFilterSlider).slider("option", "min");
 
-/* Space out values
+// Space out values
 for (var i = 0; i <= vals; i++) {
 	var el = $('<label>'+(i)+'</label>').css('left',(i/vals*100)+'%');
 
 	$(scoreFilterSlider).append(el);
 }
-*/
-config.appendChild(scoreFilterSlider2);
+
+config.appendChild(scoreFilterSlider);
 
 var excludeNoDataLabel = document.createElement('p');
 excludeNoDataLabel.id = "nomorvom_config_title";
@@ -104,7 +108,7 @@ excludeNoDataCheckbox.type = "checkbox"
 excludeNoDataCheckbox.id = "nomorvom_config_excludeNoData";
 $(excludeNoDataCheckbox).prop('checked', true);
 $(excludeNoDataCheckbox).change(function() {
-	//ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, $(excludeNoDataCheckbox).prop('checked'));
+	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, $(excludeNoDataCheckbox).prop('checked'));
 });
 excludeNoDataLabel.appendChild(excludeNoDataCheckbox);
 
@@ -150,7 +154,7 @@ self.port.on("restaurantScore", function(restaurantScore) {
 	restaurantScorePlaceholder.append(resultText);
 
 	// Filter accordingly
-	//ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, $(excludeNoDataCheckbox).prop('checked'));
+	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, $(excludeNoDataCheckbox).prop('checked'));
 });
 
 
