@@ -67,7 +67,7 @@ noUiSlider.create(scoreFilterSlider2, {
 });*/
 
 var scoreFilterSlider = document.createElement('div');
-scoreFilterSlider.id = "scoreFilter";
+scoreFilterSlider.id = "scoreFilterSlider";
 
 $(scoreFilterSlider).slider({
 	range: true,
