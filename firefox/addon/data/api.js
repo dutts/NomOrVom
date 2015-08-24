@@ -1,31 +1,45 @@
 // toilet-paper-icon_32 from Rokey (http://www.iconarchive.com/show/smooth-icons-by-rokey/toilet-paper-icon.html)
 // 48-fork-and-knife-icon by Glyphish (http://glyphish.com/)
 // test 
-// cfx run --binary-args="-url http://www.just-eat.co.uk/area/nn1-northampton"
+// jpm run --binary-args http://www.just-eat.co.uk/area/nn1-northampton
+
+function ShowElement(element) {
+	element.style.display = 'none';
+}
+
+function HideElement(element) {
+	element.style.display = '';
+}
+
+function RemoveElement(elementSelector, parentElement) {
+	parentElement = typeof parentElement !== 'undefined' ? parentElement : document;
+	var el = parentElement.querySelector(elementSelector);
+	el.parentNode.removeChild(el);
+}
 
 function AppendImg(element, filename) {
     var img = document.createElement('img');
     img.src = self.options.prefixDataURI + filename;
-    element.append(img);
+    element.appendChild(img);
 }
 
 function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
 	excludeNoData = typeof excludeNoData !== 'undefined' ? excludeNoData : true;
-	restaurantEntries.each(function () {
-		var ratingElement = $("div#nomorvom[data-rating]", this);
+	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
+		var ratingElement = el.querySelectorAll('div#nomorvom[data-rating]');
 		if (ratingElement.length) {
-			var rating = $("div#nomorvom[data-rating]", this).attr("data-rating");
+			var rating = ratingElement[0].getAttribute('data-rating');
 			//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
 			if ( (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
-				$(this).hide(); 
+				ShowElement(el); 
 			}
-			else { $(this).show(); }
+			else { HideElement(el); }
 		}
-		else { $(this).show(); }
+		else { HideElement(el); }
 	});
 }
 
-var restaurantEntries = $("div.restaurant");
+var restaurantEntries = document.querySelectorAll('div.restaurant:not(.offlineRestaurant)');
 
 var config = document.createElement('div');
 config.id = "nomorvom_config"
@@ -38,8 +52,29 @@ sliderLabel.id = "nomorvom_config_title";
 sliderLabel.appendChild(document.createTextNode("Move the sliders to filter results by hygiene rating:"));
 config.appendChild(sliderLabel);
 
+/*
+var scoreFilterSlider2 = document.createElement('div');
+scoreFilterSlider2.id = "scoreFilter";
+
+noUiSlider.create(scoreFilterSlider2, {
+	start: [0, 5],
+	orientation: 'vertical',
+	connect: true,
+	step: 1,
+	height: '400px',
+	pips: {
+		mode: 'steps',
+		orientation: 'horizontal'
+	},
+	range: {
+		'min' : 0,
+		'max' : 5
+	}
+});*/
+
 var scoreFilterSlider = document.createElement('div');
 scoreFilterSlider.id = "scoreFilterSlider";
+
 $(scoreFilterSlider).slider({
 	range: true,
 	values: [0, 5],
@@ -74,6 +109,7 @@ excludeNoDataLabel.id = "nomorvom_config_title";
 excludeNoDataLabel.style.padding = "20px 0px";
 excludeNoDataLabel.appendChild(document.createTextNode("Exclude 'No Result' Entries:"));
 
+/*
 var excludeNoDataCheckbox = document.createElement('input');
 excludeNoDataCheckbox.type = "checkbox"
 excludeNoDataCheckbox.id = "nomorvom_config_excludeNoData";
@@ -82,19 +118,20 @@ $(excludeNoDataCheckbox).change(function() {
 	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, $(excludeNoDataCheckbox).prop('checked'));
 });
 excludeNoDataLabel.appendChild(excludeNoDataCheckbox);
+*/
 
 //config.appendChild(excludeNoDataLabel);
 
-$("div.restaurants").prepend(config);
+var restaurantsDiv = document.querySelector("div.restaurants");
+restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 
 // Set up the listener for the result returned from the addon script
 self.port.on("restaurantScore", function(restaurantScore) {
-	//console.log("id " + restaurantScore.id + ", rating " + restaurantScore.rating);
 	// find the score placeholder for the restaurant we've got a result for
-	var restaurantScorePlaceholder = $("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
-	restaurantScorePlaceholder.attr("data-rating", restaurantScore.rating);
-	$("p#nomorvom_loading", restaurantScorePlaceholder).remove();
-	$("div#nomorvom_progressbar", restaurantScorePlaceholder).remove();
+	var restaurantScorePlaceholder = document.querySelector("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom"); //$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
+	restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
+	RemoveElement('p#nomorvom_loading', restaurantScorePlaceholder);
+	RemoveElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
 	
 	if (restaurantScore.rating > 0) {
 		for (var i = 0; i < restaurantScore.rating; i++) {
@@ -111,49 +148,32 @@ self.port.on("restaurantScore", function(restaurantScore) {
 	resultText.style.margin = "0px 5px";
 
 	if (restaurantScore.rating == "AwaitingInspection") {
-		$(resultText).text("This takeaway is awaiting inspection");					
+		resultText.textContent = "This takeaway is awaiting inspection";					
 		restaurantScore.rating = 0;
 	}	
 	else {
 		if (restaurantScore.rating == -1) {
-			$(resultText).text("Sorry, no food hygiene data found");
+			resultText.textContent = "Sorry, no food hygiene data found";
 		}
 		else {
-			$(resultText).text("Hygiene Score : " + restaurantScore.rating + "/5");
+			resultText.textContent = "Hygiene Score : " + restaurantScore.rating + "/5";
 		}
 	}
-	restaurantScorePlaceholder.append(resultText);
+	restaurantScorePlaceholder.appendChild(resultText);
 
 	// Filter accordingly
-	var ratingFilterRange = $(scoreFilterSlider).slider("values");
-	//var excludeNoData =  $(excludeNoDataCheckbox).prop('checked');
-	//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
-	if ((restaurantScore.rating < ratingFilterRange[0]) || (restaurantScore.rating > ratingFilterRange[1])) { 
-		$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"']").hide();
-	}
-	else
-	{
-		$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"']").show();
-	}
-
+	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, true); // $(excludeNoDataCheckbox).getAttribute('checked'));
 });
 
 
 var restaurantId = 0;
 
-restaurantEntries.each(function () {
-    var _this = $(this);
-    var name = $("h2.name a:first", this).text().trim(); 
-    var address = $("p.address:first", this)
-    	.clone()
-    	.children()
-    	.remove()
-    	.end()
-    	.text().trim();
+Array.prototype.forEach.call(restaurantEntries, function (el, i) {
+
+    var name = el.querySelector('h2.name a').textContent.trim(); 
+    var address = el.querySelector('p.address').childNodes[0].textContent.trim();
 
     self.port.emit("queryRestaurant", {id:restaurantId, name:name, address:address});
-
-//    var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
 
     var scorePlaceholder = document.createElement('div');
 	scorePlaceholder.id = "nomorvom";
@@ -166,7 +186,7 @@ restaurantEntries.each(function () {
 	loadingText.id = "nomorvom_loading";
 	loadingText.style.fontWeight = "bold";
 	loadingText.style.padding = "0px 5px";
-	$(loadingText).text("Loading food scores...");
+	loadingText.textContent = "Loading food scores...";
 	
     var loaderImg = document.createElement('div');
 	loaderImg.id = "nomorvom_progressbar";
@@ -177,11 +197,11 @@ restaurantEntries.each(function () {
 	scorePlaceholder.appendChild(loadingText);
 	scorePlaceholder.appendChild(loaderImg);
 	
-	$(scorePlaceholder).attr("data-rating", 0);
+	scorePlaceholder.setAttribute('data-rating', 0);
 
-	_this.attr("data-nomorvom-id", restaurantId);
+	el.setAttribute('data-nomorvom-id', restaurantId);
 
-    _this.append(scorePlaceholder);
+    el.appendChild(scorePlaceholder);
     
     restaurantId++;
 });
