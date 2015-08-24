@@ -4,11 +4,11 @@
 // jpm run --binary-args http://www.just-eat.co.uk/area/nn1-northampton
 
 function ShowElement(element) {
-	element.style.display = 'none';
+	element.style.display = '';
 }
 
 function HideElement(element) {
-	element.style.display = '';
+	element.style.display = 'none';
 }
 
 function RemoveElement(elementSelector, parentElement) {
@@ -24,13 +24,12 @@ function AppendImg(element, filename) {
 }
 
 function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
-	excludeNoData = typeof excludeNoData !== 'undefined' ? excludeNoData : true;
+	excludeNoData = typeof excludeNoData !== 'undefined' ? excludeNoData : false;
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 		var ratingElement = el.querySelectorAll('div#nomorvom[data-rating]');
 		if (ratingElement.length) {
-			var rating = ratingElement[0].getAttribute('data-rating');
-			//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
-			if ( (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
+			var rating = Number(ratingElement[0].getAttribute('data-rating'));
+			if ( (rating < 0 && excludeNoData == false) || (rating >= Number(ratingFilterRange[0]) && rating <= Number(ratingFilterRange[1])) ) { 
 				ShowElement(el); 
 			}
 			else { HideElement(el); }
@@ -43,9 +42,6 @@ var restaurantEntries = document.querySelectorAll('div.restaurant:not(.offlineRe
 
 var config = document.createElement('div');
 config.id = "nomorvom_config"
-config.style.border = "thin dashed red";
-config.style.padding = "5px 10px 25px 10px";
-config.style.margin = "5px";
 
 var sliderLabel = document.createElement('p');
 sliderLabel.id = "nomorvom_config_title";
@@ -82,17 +78,10 @@ $(scoreFilterSlider).slider({
 	max: 5,
 	step: 1,
 	slide: function( event, ui ) {
-		ApplyFilter(ui.values, restaurantEntries);
+		ApplyFilter(ui.values, restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
 	}
 });
 
-//
-// Add labels to slider whose values 
-// are specified by min, max and whose
-// step is set to 1
-//
-
-// Get the number of possible values
 var vals = $(scoreFilterSlider).slider("option", "max") - $(scoreFilterSlider).slider("option", "min");
 
 // Space out values
@@ -105,22 +94,19 @@ for (var i = 0; i <= vals; i++) {
 config.appendChild(scoreFilterSlider);
 
 var excludeNoDataLabel = document.createElement('p');
-excludeNoDataLabel.id = "nomorvom_config_title";
-excludeNoDataLabel.style.padding = "20px 0px";
+excludeNoDataLabel.id = "nomorvom_config_excludeNoData";
 excludeNoDataLabel.appendChild(document.createTextNode("Exclude 'No Result' Entries:"));
 
-/*
 var excludeNoDataCheckbox = document.createElement('input');
 excludeNoDataCheckbox.type = "checkbox"
-excludeNoDataCheckbox.id = "nomorvom_config_excludeNoData";
-$(excludeNoDataCheckbox).prop('checked', true);
-$(excludeNoDataCheckbox).change(function() {
-	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, $(excludeNoDataCheckbox).prop('checked'));
+excludeNoDataCheckbox.id = "nomorvom_config_excludeNoData_checkbox";
+excludeNoDataCheckbox.checked = true;
+excludeNoDataCheckbox.addEventListener('change', function() {
+	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, excludeNoDataCheckbox.checked);
 });
 excludeNoDataLabel.appendChild(excludeNoDataCheckbox);
-*/
 
-//config.appendChild(excludeNoDataLabel);
+config.appendChild(excludeNoDataLabel);
 
 var restaurantsDiv = document.querySelector("div.restaurants");
 restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
@@ -128,7 +114,7 @@ restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 // Set up the listener for the result returned from the addon script
 self.port.on("restaurantScore", function(restaurantScore) {
 	// find the score placeholder for the restaurant we've got a result for
-	var restaurantScorePlaceholder = document.querySelector("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom"); //$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
+	var restaurantScorePlaceholder = document.querySelector("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
 	restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
 	RemoveElement('p#nomorvom_loading', restaurantScorePlaceholder);
 	RemoveElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
@@ -143,9 +129,7 @@ self.port.on("restaurantScore", function(restaurantScore) {
 	}
 
 	var resultText = document.createElement('div');
-	resultText.id = "hygieneScore"
-	resultText.style.fontWeight = "bold";
-	resultText.style.margin = "0px 5px";
+	resultText.id = "nomorvom_hygieneScore"
 
 	if (restaurantScore.rating == "AwaitingInspection") {
 		resultText.textContent = "This takeaway is awaiting inspection";					
@@ -162,7 +146,7 @@ self.port.on("restaurantScore", function(restaurantScore) {
 	restaurantScorePlaceholder.appendChild(resultText);
 
 	// Filter accordingly
-	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, true); // $(excludeNoDataCheckbox).getAttribute('checked'));
+	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
 });
 
 
@@ -177,15 +161,9 @@ Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 
     var scorePlaceholder = document.createElement('div');
 	scorePlaceholder.id = "nomorvom";
-	scorePlaceholder.style.border = "thin dashed red";
-    scorePlaceholder.style.padding = "5px";
-	scorePlaceholder.style.margin = "5px";
-	scorePlaceholder.width = "50%";
 	
 	var loadingText = document.createElement('p');
 	loadingText.id = "nomorvom_loading";
-	loadingText.style.fontWeight = "bold";
-	loadingText.style.padding = "0px 5px";
 	loadingText.textContent = "Loading food scores...";
 	
     var loaderImg = document.createElement('div');
