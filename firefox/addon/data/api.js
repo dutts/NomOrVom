@@ -165,12 +165,16 @@ Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 	var loadingText = document.createElement('p');
 	loadingText.id = "nomorvom_loading";
 	loadingText.textContent = "Loading food scores...";
-	
+
     var loaderImg = document.createElement('div');
 	loaderImg.id = "nomorvom_progressbar";
-	$(loaderImg).progressbar({
-      value: false
-	});
+
+	var img = new Image();
+	img.onload = function() {
+  		loaderImg.appendChild(img);
+	};
+
+	img.src = self.options.prefixDataURI + 'loading.gif';
 	
 	scorePlaceholder.appendChild(loadingText);
 	scorePlaceholder.appendChild(loaderImg);
