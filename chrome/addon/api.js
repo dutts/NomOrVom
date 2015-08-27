@@ -93,13 +93,18 @@ Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 	scorePlaceholder.id = "nomorvom"
 	
 	var loadingText = document.createElement('p');
+	loadingText.id = "nomorvom_loading";
 	loadingText.textContent = "Loading food scores...";
 	
     var loaderImg = document.createElement('div');
-	loaderImg.id = "progressbar";
-	$(loaderImg).progressbar({
-      value: false
-	});
+	loaderImg.id = "nomorvom_progressbar";
+
+	var img = new Image();
+	img.onload = function() {
+  		loaderImg.appendChild(img);
+	};
+
+	img.src = chrome.extension.getURL('loading.gif');
 	
 	scorePlaceholder.appendChild(loadingText);
 	scorePlaceholder.appendChild(loaderImg);
