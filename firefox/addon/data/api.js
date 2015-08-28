@@ -70,7 +70,6 @@ noUiSlider.create(scoreFilterSlider2, {
 
 var scoreFilterSlider = document.createElement('div');
 scoreFilterSlider.id = "scoreFilterSlider";
-
 $(scoreFilterSlider).slider({
 	range: true,
 	values: [0, 5],
@@ -148,7 +147,6 @@ self.port.on("restaurantScore", function(restaurantScore) {
 	// Filter accordingly
 	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
 });
-
 
 var restaurantId = 0;
 
