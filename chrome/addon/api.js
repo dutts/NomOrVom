@@ -82,13 +82,71 @@ config.appendChild(excludeNoDataLabel);
 var restaurantsDiv = document.querySelector("div.restaurants");
 restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 
+/// new stuff
+
+var port = chrome.runtime.connect({name:"scorelookup"});
+
+port.onMessage.addListener(function(restaurantScore) {
+  	//console.log("lookup: "+ restaurantScore.id + "(" + restaurantScore.rating + ")");
+    console.log(restaurantScore.resp);
+
+	//console.log("id " + restaurantScore.id + ", rating " + restaurantScore.rating);
+	// find the score placeholder for the restaurant we've got a result for
+	var restaurantScorePlaceholder = $("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
+	restaurantScorePlaceholder.attr("data-rating", restaurantScore.rating);
+	$("p#nomorvom_loading", restaurantScorePlaceholder).remove();
+	$("div#nomorvom_progressbar", restaurantScorePlaceholder).remove();
+	
+	if (restaurantScore.rating > 0) {
+		for (var i = 0; i < restaurantScore.rating; i++) {
+			AppendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
+		}
+		for (var i = 0; i < 5 - restaurantScore.rating; i++) {
+			AppendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
+		}
+	}
+
+	var resultText = document.createElement('div');
+	resultText.id = "hygieneScore"
+	resultText.style.fontWeight = "bold";
+	resultText.style.margin = "0px 5px";
+
+	if (restaurantScore.rating == "AwaitingInspection") {
+		$(resultText).text("This takeaway is awaiting inspection");					
+		restaurantScore.rating = 0;
+	}	
+	else {
+		if (restaurantScore.rating == -1) {
+			$(resultText).text("Sorry, no food hygiene data found");
+		}
+		else {
+			$(resultText).text("Hygiene Score : " + restaurantScore.rating + "/5");
+		}
+	}
+	restaurantScorePlaceholder.append(resultText);
+
+	// Filter accordingly
+	var ratingFilterRange = $(scoreFilterSlider).slider("values");
+	//var excludeNoData =  $(excludeNoDataCheckbox).prop('checked');
+	//if ( ((rating == -1) && excludeNoData) || (rating < ratingFilterRange[0]) || (rating > ratingFilterRange[1]) ) { 
+	if ((restaurantScore.rating < ratingFilterRange[0]) || (restaurantScore.rating > ratingFilterRange[1])) { 
+		$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"']").hide();
+	}
+	else
+	{
+		$("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"']").show();
+	}
+});
+
+var restaurantId = 0;
+
 Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 
     var name = el.querySelector('h2.name a').textContent.trim(); 
     var address = el.querySelector('p.address').childNodes[0].textContent.trim();
 
-    var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
-
+	port.postMessage({id:restaurantId, name:name, address:address});
+    
     var scorePlaceholder = document.createElement('div');
 	scorePlaceholder.id = "nomorvom"
 	
@@ -112,7 +170,9 @@ Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 	scorePlaceholder.setAttribute('data-rating', 0);
 	
     el.appendChild(scorePlaceholder);
-    
+ 
+    restaurantId++;
+/*   
     var rating = 0;
 
     $.ajax({
@@ -158,4 +218,5 @@ Array.prototype.forEach.call(restaurantEntries, function (el, i) {
         error: function (error) { },
         beforeSend: function (xhr) { xhr.setRequestHeader('x-api-version', 2); }
     });
+*/
 });

@@ -15,5 +15,12 @@
       "run_at": "document_end"
      }
   ],
+  "permissions": [
+      "http://*.food.gov.uk/", "https://*.food.gov.uk/"
+  ],
+  "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+  },
   "web_accessible_resources": ["48-fork-and-knife-icon.png","toilet-paper-icon_32.png","loading.gif"]
 }
