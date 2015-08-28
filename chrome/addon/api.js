@@ -9,6 +9,12 @@ function HideElement(element) {
 	element.style.display = 'none';
 }
 
+function RemoveElement(elementSelector, parentElement) {
+	parentElement = typeof parentElement !== 'undefined' ? parentElement : document;
+	var el = parentElement.querySelector(elementSelector);
+	el.parentNode.removeChild(el);
+}
+
 function AppendImg(element, filename) {
     var img = document.createElement('img');
     img.src = chrome.extension.getURL(filename);
@@ -49,7 +55,7 @@ $(scoreFilterSlider).slider({
 	max: 5,
 	step: 1,
 	slide: function( event, ui ) {
-		ApplyFilter(ui.values, restaurantEntries);
+		ApplyFilter(ui.values, restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
 	}
 });
 
@@ -82,15 +88,57 @@ config.appendChild(excludeNoDataLabel);
 var restaurantsDiv = document.querySelector("div.restaurants");
 restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 
+var port = chrome.runtime.connect({name:"scorelookup"});
+
+// Set up the listener for the result returned from the addon script
+port.onMessage.addListener(function(restaurantScore) {
+	// find the score placeholder for the restaurant we've got a result for
+	var restaurantScorePlaceholder = document.querySelector("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
+	restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
+	RemoveElement('p#nomorvom_loading', restaurantScorePlaceholder);
+	RemoveElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
+	
+	if (restaurantScore.rating > 0) {
+		for (var i = 0; i < restaurantScore.rating; i++) {
+			AppendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
+		}
+		for (var i = 0; i < 5 - restaurantScore.rating; i++) {
+			AppendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
+		}
+	}
+
+	var resultText = document.createElement('div');
+	resultText.id = "nomorvom_hygieneScore"
+
+	if (restaurantScore.rating == "AwaitingInspection") {
+		resultText.textContent = "This takeaway is awaiting inspection";					
+		restaurantScore.rating = 0;
+	}	
+	else {
+		if (restaurantScore.rating == -1) {
+			resultText.textContent = "Sorry, no food hygiene data found";
+		}
+		else {
+			resultText.textContent = "Hygiene Score : " + restaurantScore.rating + "/5";
+		}
+	}
+	restaurantScorePlaceholder.appendChild(resultText);
+
+	// Filter accordingly
+	ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
+});
+
+var restaurantId = 0;
+
 Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 
     var name = el.querySelector('h2.name a').textContent.trim(); 
     var address = el.querySelector('p.address').childNodes[0].textContent.trim();
 
-    var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address);
-
+	port.postMessage({id:restaurantId, name:name, address:address});
+    
     var scorePlaceholder = document.createElement('div');
-	scorePlaceholder.id = "nomorvom"
+	scorePlaceholder.id = "nomorvom";
 	
 	var loadingText = document.createElement('p');
 	loadingText.id = "nomorvom_loading";
@@ -111,51 +159,9 @@ Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 	
 	scorePlaceholder.setAttribute('data-rating', 0);
 	
+	el.setAttribute('data-nomorvom-id', restaurantId);
+
     el.appendChild(scorePlaceholder);
-    
-    var rating = 0;
-
-    $.ajax({
-        url: url,
-        type: 'GET',
-        dataType: 'json',
-        cache: false,
-        success: function (data, status) {
-        	var rating = -1;
-        	loadingText.parentNode.removeChild(loadingText);
-			loaderImg.parentNode.removeChild(loaderImg);
-
-			var resultText = document.createElement('div');
-			resultText.id = "nomorvom_hygieneScore"
-
-			if (data.establishments.length > 0) {
-				rating = data.establishments[0].RatingValue;
-				for (var i = 0; i < rating; i++) {
-					AppendImg(scorePlaceholder, '48-fork-and-knife-icon.png');
-				}
-				for (var i = 0; i < 5 - rating; i++) {
-					AppendImg(scorePlaceholder, 'toilet-paper-icon_32.png');
-				}
-				if (rating == "AwaitingInspection") {
-					resultText.textContent = "This takeaway is awaiting inspection";					
-					rating = 0;
-				}	
-				else {
-					resultText.textContent = "Hygiene Score : " + rating + "/5";
-				}
-			}
-			else {
-				resultText.textContent = "Sorry, no food hygiene data found";
-				rating = -1;
-			}
-
-			scorePlaceholder.appendChild(resultText);
-			scorePlaceholder.setAttribute('data-rating', rating);
-
-			
-			ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
-        },
-        error: function (error) { },
-        beforeSend: function (xhr) { xhr.setRequestHeader('x-api-version', 2); }
-    });
+ 
+    restaurantId++;
 });
