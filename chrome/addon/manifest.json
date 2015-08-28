@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "NomOrVom",
-  "version": "0.14",
+  "version": "0.17",
   "description": "How clean is your takeaway? Never eat from a dodgy takeaway again. Food.gov.uk hygiene scores in your Just Eat search results",
   "author": "Richard Dutton",
   "icons": { "32": "toilet-paper-icon_32.png",
