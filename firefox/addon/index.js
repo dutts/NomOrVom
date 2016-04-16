@@ -16,6 +16,7 @@ function startListening(worker) {
 		
 		var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(restaurant.name) + "&address=" + encodeURIComponent(restaurant.address); 
 		var rating = 0;
+		var ratingDate = '';
 
 		var Request = require("sdk/request").Request;
 		var foodLookupRequest = Request({
@@ -25,12 +26,13 @@ function startListening(worker) {
 				if (response.json != null) {
 					if (response.json.establishments.length > 0) {
 						rating = response.json.establishments[0].RatingValue;
+						ratingDate = response.json.establishments[0].RatingDate;
 					} 
 					else {
 						rating = -1;
 					}
 				}
-				worker.port.emit("restaurantScore", {id:restaurant.id, rating:rating});
+				worker.port.emit("restaurantScore", {id:restaurant.id, rating:rating, date:ratingDate});
 			}
 		}).get();
 	});	

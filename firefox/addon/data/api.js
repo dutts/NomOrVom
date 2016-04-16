@@ -141,6 +141,8 @@ self.port.on("restaurantScore", function(restaurantScore) {
 		else {
 			resultText.textContent = "Hygiene Score : " + restaurantScore.rating + "/5";
 		}
+		resultText.appendChild(document.createElement('br'));
+		resultText.appendChild(document.createTextNode("Rated on " + restaurantScore.date.substring(0, 10)));
 	}
 	restaurantScorePlaceholder.appendChild(resultText);
 
