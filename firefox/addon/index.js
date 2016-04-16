@@ -14,7 +14,17 @@ function startListening(worker) {
 	worker.port.on("queryRestaurant", function(restaurant) {
 		//console.log(restaurant);
 		
-		var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(restaurant.name) + "&address=" + encodeURIComponent(restaurant.address); 
+		var postcodeRegexp = /[A-Z]{1,2}[0-9]{1,2}[A-Z]{0,1} [0-9][A-Z]{2}/;
+		var postcodeIndex = restaurant.address.search(postcodeRegexp);
+		var address;
+		if (postcodeIndex === -1) {
+			// this should never happen
+			address = restaurant.address;
+		}
+		else {
+			address = restaurant.address.substring(postcodeIndex);
+		}
+		var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(restaurant.name) + "&address=" + encodeURIComponent(address); 
 		var rating = 0;
 		var ratingDate = '';
 
