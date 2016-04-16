@@ -152,7 +152,7 @@ var restaurantId = 0;
 
 Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 
-    var name = el.querySelector('h2.name a').textContent.trim(); 
+    var name = el.querySelector('h2.name').textContent.trim();
     var address = el.querySelector('p.address').childNodes[0].textContent.trim();
 
     self.port.emit("queryRestaurant", {id:restaurantId, name:name, address:address});
