@@ -1,0 +1,12 @@
+# Site settings
+title: NomOrVom
+email: website@nomorvom.co.uk
+description: > # this means to ignore newlines until "baseurl:"
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "" # the base hostname & protocol for your site
+
+twitter_username: dutts303
+github_username: dutts
+
+# Build settings
+markdown: kramdown

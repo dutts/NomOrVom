@@ -1,0 +1,32 @@
+  <aside class="bg-dark">
+      <div class="container text-center">
+          <div class="call-to-action">
+              <h2>Download</h2>
+              <hr class="primary">
+              <div id="nomorvom_browser"></div>
+          </div>
+      </div>
+  </aside>
+ 
+<script>
+window.onload = myFunction;
+function myFunction() { 
+    var browserElement = document.getElementById("nomorvom_browser");
+    if(navigator.userAgent.indexOf("Chrome") != -1 ) {
+        browserElement.innerHTML = "<a href='https://chrome.google.com/webstore/detail/nomorvom/dlddncninpbgmlehociemoojbhhhnmph' class='btn btn-default btn-xl wow tada'>Chrome web store</a>";
+    }
+    //else if(navigator.userAgent.indexOf("Opera") != -1 ) {
+     //alert('Opera');
+    //}
+    else if(navigator.userAgent.indexOf("Firefox") != -1 ) {
+        browserElement.innerHTML = "<a href='https://addons.mozilla.org/en-US/firefox/addon/nomorvom/' class='btn btn-default btn-xl wow tada'>Firefox Add-On store</a>";
+        //"<a href='https://addons.mozilla.org/firefox/downloads/latest/573740/addon-573740-latest.xpi'>Add to Firefox</a>";
+    }
+    //else if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )) {
+      //alert('IE'); 
+    //}  
+    else {
+       browserElement.innerHTML = "Currently Chrome and Firefox only, check <a href='http://nomorvom.azurewebsites.net/?page_id=152'>blog</a> for latest browser support.";
+    }
+}
+</script>
