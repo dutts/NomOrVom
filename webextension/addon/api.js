@@ -141,7 +141,7 @@ if (window.location.href.indexOf("just-eat.co.uk") > -1) {
 		port.postMessage({id:restaurantId, name:name, address:address});
 		var scorePlaceholder = CreateScorePlaceholderElement(chrome.extension.getURL('loading.gif'));		
 		el.setAttribute('data-nomorvom-id', restaurantId);
-	    el.appendChild(scorePlaceholder);
+		el.appendChild(scorePlaceholder);
 	    restaurantId++;
 	});
 }
