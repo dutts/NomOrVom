@@ -35,7 +35,7 @@ chrome.runtime.onConnect.addListener(function(port){
 					else {
 						rating = -1;
 					}
-					console.log(restaurant.id + " " + rating);
+					//console.log(restaurant.id + " " + rating);
 					port.postMessage({id:restaurant.id, rating:rating, date:ratingDate});
 				}
 			};
