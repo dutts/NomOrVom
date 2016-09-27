@@ -99,13 +99,13 @@ function CreateConfigElement() {
 
 // Just-Eat
 if (window.location.href.indexOf("just-eat.co.uk") > -1) {
-	var restaurantEntries = document.querySelectorAll('div.restaurant:not(.offlineRestaurant)');
+	var restaurantEntries = document.querySelectorAll('div.c-restaurant');
 	var config = CreateConfigElement();
-	var restaurantsDiv = document.querySelector("div.restaurants");
+	var restaurantsDiv = document.querySelector("div[data-ft='openRestaurantsList']");
 	restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 	var port = chrome.runtime.connect({name:"scorelookup"});
 	port.onMessage.addListener(function(restaurantScore) {
-		var restaurantScorePlaceholder = document.querySelector("div.restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
+		var restaurantScorePlaceholder = document.querySelector("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
 		restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
 		RemoveElement('p#nomorvom_loading', restaurantScorePlaceholder);
 		RemoveElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
@@ -136,8 +136,8 @@ if (window.location.href.indexOf("just-eat.co.uk") > -1) {
 	});
 	var restaurantId = 0;
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
-	    var name = el.querySelector('h2.name').textContent.trim(); 
-	    var address = el.querySelector('p.address').childNodes[0].textContent.trim();
+	    var name = el.querySelector("h2[itemprop='name']").textContent.trim();
+	    var address = el.querySelector('p.c-restaurant__address').textContent.trim();
 		port.postMessage({id:restaurantId, name:name, address:address});
 		var scorePlaceholder = CreateScorePlaceholderElement(chrome.extension.getURL('loading.gif'));		
 		el.setAttribute('data-nomorvom-id', restaurantId);
