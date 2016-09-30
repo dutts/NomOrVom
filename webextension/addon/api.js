@@ -152,20 +152,24 @@ if (window.location.href.indexOf("just-eat.co.uk") > -1) {
 
 // Hungry House
 if (window.location.href.indexOf("hungryhouse.co.uk") > -1) {
-	var restaurantEntries = document.querySelectorAll('div.restsSearchItemRes'); 
+	var restaurantEntries = document.querySelectorAll('div.restaurantBlock'); 
+	//var config = CreateConfigElement(); 
+  	//var restaurantsDiv = document.querySelector("div.searchItems"); 
+  	//restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 	var port = chrome.runtime.connect({name:"linkedPageScoreLookup"});
 	port.onMessage.addListener(function(restaurantScore) {
-		ApplyResult("div.restsSearchItemRes[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom", restaurantScore);
+	    var scorePlaceholder = CreateScorePlaceholderElement(chrome.extension.getURL('loading.gif'));
+    	var restaurantElement = document.querySelector("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes")
+	    restaurantElement.appendChild(scorePlaceholder);
+
+		ApplyResult("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes div#nomorvom", restaurantScore);
 	});
-	var restaurantId = 0;
+	
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
+		var restaurantId = el.getAttribute("data-id");
 	    var name = el.querySelector('a.restPageLink').textContent.trim(); 
     	var pageUri = el.querySelector('a.restPageLink').getAttribute('href').trim();
 		var fullPageUri = window.location.protocol + "//" + window.location.host + pageUri;
 		port.postMessage({id:restaurantId, name:name, fullPageUri:fullPageUri});	    
-	    var scorePlaceholder = CreateScorePlaceholderElement(chrome.extension.getURL('loading.gif'));
-		el.setAttribute('data-nomorvom-id', restaurantId);
-	    el.appendChild(scorePlaceholder);
-	    restaurantId++;
 	});
 }
