@@ -36,6 +36,36 @@ function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
 	});
 }
 
+function ApplyResult(placeholderSelector, restaurantScore) {
+	var restaurantScorePlaceholder = document.querySelector(placeholderSelector);
+	restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
+	RemoveElement('p#nomorvom_loading', restaurantScorePlaceholder);
+	RemoveElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
+	if (restaurantScore.rating > 0) {
+		for (var i = 0; i < restaurantScore.rating; i++) {
+			AppendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
+		}
+		for (var i = 0; i < 5 - restaurantScore.rating; i++) {
+			AppendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
+		}
+	}
+	var resultText = document.createElement('div');
+	resultText.id = "nomorvom_hygieneScore"
+	if (restaurantScore.rating == "AwaitingInspection") {
+		resultText.textContent = "This takeaway is awaiting inspection";					
+		restaurantScore.rating = 0;
+	}	
+	else {
+		if (restaurantScore.rating == -1) {
+			resultText.textContent = "Sorry, no food hygiene data found";
+		}
+		else {
+			resultText.textContent = "Hygiene Score : " + restaurantScore.rating + "/5";
+		}
+	}
+	restaurantScorePlaceholder.appendChild(resultText);
+}
+
 function CreateScorePlaceholderElement(loadingImageSource) {
     var scorePlaceholder = document.createElement('div');
 	scorePlaceholder.id = "nomorvom";
@@ -105,33 +135,7 @@ if (window.location.href.indexOf("just-eat.co.uk") > -1) {
 	restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 	var port = chrome.runtime.connect({name:"scorelookup"});
 	port.onMessage.addListener(function(restaurantScore) {
-		var restaurantScorePlaceholder = document.querySelector("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
-		restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
-		RemoveElement('p#nomorvom_loading', restaurantScorePlaceholder);
-		RemoveElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
-		if (restaurantScore.rating > 0) {
-			for (var i = 0; i < restaurantScore.rating; i++) {
-				AppendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
-			}
-			for (var i = 0; i < 5 - restaurantScore.rating; i++) {
-				AppendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
-			}
-		}
-		var resultText = document.createElement('div');
-		resultText.id = "nomorvom_hygieneScore"
-		if (restaurantScore.rating == "AwaitingInspection") {
-			resultText.textContent = "This takeaway is awaiting inspection";					
-			restaurantScore.rating = 0;
-		}	
-		else {
-			if (restaurantScore.rating == -1) {
-				resultText.textContent = "Sorry, no food hygiene data found";
-			}
-			else {
-				resultText.textContent = "Hygiene Score : " + restaurantScore.rating + "/5";
-			}
-		}
-		restaurantScorePlaceholder.appendChild(resultText);
+		ApplyResult("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom", restaurantScore);
 		ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
 	});
 	var restaurantId = 0;
@@ -151,33 +155,7 @@ if (window.location.href.indexOf("hungryhouse.co.uk") > -1) {
 	var restaurantEntries = document.querySelectorAll('div.restsSearchItemRes'); 
 	var port = chrome.runtime.connect({name:"linkedPageScoreLookup"});
 	port.onMessage.addListener(function(restaurantScore) {
-		var restaurantScorePlaceholder = document.querySelector("div.restsSearchItemRes[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom");
-		restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
-		RemoveElement('p#nomorvom_loading', restaurantScorePlaceholder);
-		RemoveElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
-		if (restaurantScore.rating > 0) {
-			for (var i = 0; i < restaurantScore.rating; i++) {
-				AppendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
-			}
-			for (var i = 0; i < 5 - restaurantScore.rating; i++) {
-				AppendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
-			}
-		}
-		var resultText = document.createElement('div');
-		resultText.id = "nomorvom_hygieneScore"
-		if (restaurantScore.rating == "AwaitingInspection") {
-			resultText.textContent = "This takeaway is awaiting inspection";					
-			restaurantScore.rating = 0;
-		}	
-		else {
-			if (restaurantScore.rating == -1) {
-				resultText.textContent = "Sorry, no food hygiene data found";
-			}
-			else {
-				resultText.textContent = "Hygiene Score : " + restaurantScore.rating + "/5";
-			}
-		}
-		restaurantScorePlaceholder.appendChild(resultText);
+		ApplyResult("div.restsSearchItemRes[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom", restaurantScore);
 	});
 	var restaurantId = 0;
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
