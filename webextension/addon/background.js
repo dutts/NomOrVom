@@ -1,3 +1,32 @@
+function LookupRating(id, name, address, postFunc) {
+	var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address); 
+
+	var rating = 0;
+	var ratingDate = '';
+
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4)
+		{
+			var resp = JSON.parse(xhr.responseText);
+			if (resp.establishments.length > 0) {
+				rating = resp.establishments[0].RatingValue;
+				ratingDate = resp.establishments[0].RatingDate;
+			}
+			else {
+				rating = -1;
+			}
+			//console.log(restaurant.id + " " + rating);
+			postFunc(id, rating, ratingDate);
+		}
+	};
+	xhr.open("GET", url, true);
+	xhr.setRequestHeader('x-api-version', 2);
+	xhr.setRequestHeader('Content-Type','application/json');
+	xhr.setRequestHeader('Accept','application/json');
+	xhr.send();
+} 
+
 var parseHTML = function(str) {
 	var tmp = document.implementation.createDocument();
 	tmp.documentElement.appendChild(str)
@@ -17,33 +46,9 @@ chrome.runtime.onConnect.addListener(function(port){
 			else {
 				address = restaurant.address.substring(postcodeIndex);
 			}
-
-	  		var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(restaurant.name) + "&address=" + encodeURIComponent(address); 
-
-			var rating = 0;
-			var ratingDate = '';
-
-			var xhr = new XMLHttpRequest();
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState == 4)
-				{
-					var resp = JSON.parse(xhr.responseText);
-					if (resp.establishments.length > 0) {
-						rating = resp.establishments[0].RatingValue;
-						ratingDate = resp.establishments[0].RatingDate;
-					}
-					else {
-						rating = -1;
-					}
-					//console.log(restaurant.id + " " + rating);
-					port.postMessage({id:restaurant.id, rating:rating, date:ratingDate});
-				}
-			};
-			xhr.open("GET", url, true);
-			xhr.setRequestHeader('x-api-version', 2);
-			xhr.setRequestHeader('Content-Type','application/json');
-			xhr.setRequestHeader('Accept','application/json');
-			xhr.send();
+			LookupRating(restaurant.id, restaurant.name, address, function(id, rating, ratingDate) { 
+				port.postMessage({id:id, rating:rating, date:ratingDate});
+			});
 	  	});
 	}
 	if(port.name == "linkedPageScoreLookup") {
@@ -67,31 +72,21 @@ chrome.runtime.onConnect.addListener(function(port){
 
 					var postcodeElement = addressElement.querySelector('span[itemprop="postalCode"]');
 					if (postcodeElement) restaurantAddress += ", " + postcodeElement.innerHTML.trim();
-					
-			  		var url = "http://api.ratings.food.gov.uk/Establishments?address=" + encodeURIComponent(restaurantAddress); 
 
-					var rating = 0;
-
-					var xhrFood = new XMLHttpRequest();
-					xhrFood.onreadystatechange = function() {
-						if (xhrFood.readyState == 4)
-						{
-							var resp = JSON.parse(xhrFood.responseText);
-							if (resp.establishments.length > 0) {
-								rating = resp.establishments[0].RatingValue;
-							}
-							else {
-								rating = -1;
-								//console.log(restaurant.id + " " + restaurant.name + " " + restaurantAddress);
-							}
-							port.postMessage({id:restaurant.id, rating:rating});
-						}
-					};
-					xhrFood.open("GET", url, true);
-					xhrFood.setRequestHeader('x-api-version', 2);
-					xhrFood.setRequestHeader('Content-Type','application/json');
-					xhrFood.setRequestHeader('Accept','application/json');
-					xhrFood.send();
+					var postcodeRegexp = /[A-Z]{1,2}[0-9]{1,2}[A-Z]{0,1} [0-9][A-Z]{2}/;
+					var postcodeIndex = restaurantAddress.search(postcodeRegexp);
+					var address;
+					if (postcodeIndex === -1) {
+						// this should never happen
+						address = restaurantAddress;
+					}
+					else {
+						address = restaurantAddress.substring(postcodeIndex);
+					}
+			
+					LookupRating(restaurant.id, restaurant.name, address, function(id, rating, ratingDate) { 
+						port.postMessage({id:id, rating:rating, date:ratingDate});
+					});		
 				}
 			};
 			xhr.open("GET", restaurant.fullPageUri);
