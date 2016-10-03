@@ -41,7 +41,7 @@ function applyResult(placeholderSelector, restaurantScore) {
 	restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
 	removeElement('p#nomorvom_loading', restaurantScorePlaceholder);
 	removeElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
-	if (restaurantScore.rating > 0) {
+	if (restaurantScore.rating > -1) {
 		for (var i = 0; i < restaurantScore.rating; i++) {
 			appendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
 		}
@@ -81,7 +81,7 @@ function createScorePlaceholderElement(loadingImageSource) {
 	img.src = loadingImageSource;
 	scorePlaceholder.appendChild(loadingText);
 	scorePlaceholder.appendChild(loaderImg);
-	scorePlaceholder.setAttribute('data-rating', 0);
+	scorePlaceholder.setAttribute('data-rating', -1);
 	return scorePlaceholder;
 }
 
