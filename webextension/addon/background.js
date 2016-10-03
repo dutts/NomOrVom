@@ -1,4 +1,4 @@
-function LookupRating(id, name, address, postFunc) {
+function lookupRating(id, name, address, postFunc) {
 	var url = "http://api.ratings.food.gov.uk/Establishments?name=" + encodeURIComponent(name) + "&address=" + encodeURIComponent(address); 
 
 	var rating = 0;
@@ -27,34 +27,31 @@ function LookupRating(id, name, address, postFunc) {
 	xhr.send();
 } 
 
-var parseHTML = function(str) {
-	var tmp = document.implementation.createDocument();
-	tmp.documentElement.appendChild(str)
-	return tmp.body.children;
+function postcodeOrAddress(addressString) {
+	var postcodeRegexp = /[A-Z]{1,2}[0-9]{1,2}[A-Z]{0,1} [0-9][A-Z]{2}/;
+	var postcodeIndex = addressString.search(postcodeRegexp);
+	var address;
+	if (postcodeIndex === -1) {
+		// this should never happen
+		address = addressString;
+	}
+	else {
+		address = addressString.substring(postcodeIndex);
+	}
+	return address;
 }
 
 chrome.runtime.onConnect.addListener(function(port){
 	if(port.name == "scorelookup") {
 		port.onMessage.addListener(function(restaurant) {
-			var postcodeRegexp = /[A-Z]{1,2}[0-9]{1,2}[A-Z]{0,1} [0-9][A-Z]{2}/;
-			var postcodeIndex = restaurant.address.search(postcodeRegexp);
-			var address;
-			if (postcodeIndex === -1) {
-				// this should never happen
-				address = restaurant.address;
-			}
-			else {
-				address = restaurant.address.substring(postcodeIndex);
-			}
-			LookupRating(restaurant.id, restaurant.name, address, function(id, rating, ratingDate) { 
+			var address = postcodeOrAddress(restaurant.address);
+			lookupRating(restaurant.id, restaurant.name, address, function(id, rating, ratingDate) { 
 				port.postMessage({id:id, rating:rating, date:ratingDate});
 			});
 	  	});
 	}
 	if(port.name == "linkedPageScoreLookup") {
 		port.onMessage.addListener(function(restaurant) {
-			//console.log(restaurant.name + " " + restaurant.fullPageUri);
-			
 			var xhr = new XMLHttpRequest();
 			xhr.onload = function() {
 				if (xhr.readyState == 4)
@@ -73,18 +70,9 @@ chrome.runtime.onConnect.addListener(function(port){
 					var postcodeElement = addressElement.querySelector('span[itemprop="postalCode"]');
 					if (postcodeElement) restaurantAddress += ", " + postcodeElement.innerHTML.trim();
 
-					var postcodeRegexp = /[A-Z]{1,2}[0-9]{1,2}[A-Z]{0,1} [0-9][A-Z]{2}/;
-					var postcodeIndex = restaurantAddress.search(postcodeRegexp);
-					var address;
-					if (postcodeIndex === -1) {
-						// this should never happen
-						address = restaurantAddress;
-					}
-					else {
-						address = restaurantAddress.substring(postcodeIndex);
-					}
+					var address = postcodeOrAddress(restaurantAddress);
 			
-					LookupRating(restaurant.id, restaurant.name, address, function(id, rating, ratingDate) { 
+					lookupRating(restaurant.id, restaurant.name, address, function(id, rating, ratingDate) { 
 						port.postMessage({id:id, rating:rating, date:ratingDate});
 					});		
 				}
