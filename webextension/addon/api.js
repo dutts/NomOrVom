@@ -1,52 +1,52 @@
 // toilet-paper-icon_32 from Rokey (http://www.iconarchive.com/show/smooth-icons-by-rokey/toilet-paper-icon.html)
 // 48-fork-and-knife-icon by Glyphish (http://glyphish.com/)
 
-function ShowElement(element) {
+function showElement(element) {
 	element.style.display = '';
 }
 
-function HideElement(element) {
+function hideElement(element) {
 	element.style.display = 'none';
 }
 
-function RemoveElement(elementSelector, parentElement) {
+function removeElement(elementSelector, parentElement) {
 	parentElement = typeof parentElement !== 'undefined' ? parentElement : document;
 	var el = parentElement.querySelector(elementSelector);
 	el.parentNode.removeChild(el);
 }
 
-function AppendImg(element, filename) {
+function appendImg(element, filename) {
     var img = document.createElement('img');
     img.src = chrome.extension.getURL(filename);
     element.appendChild(img);
 }
 
-function ApplyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
+function applyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
 	excludeNoData = typeof excludeNoData !== 'undefined' ? excludeNoData : true;
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 		var ratingElement = el.querySelectorAll('div#nomorvom[data-rating]');
 		if (ratingElement.length) {
 			var rating = Number(ratingElement[0].getAttribute('data-rating'));
 			if ( (rating < 0 && excludeNoData == false) || (rating >= Number(ratingFilterRange[0]) && rating <= Number(ratingFilterRange[1])) ) { 
-				ShowElement(el); 
+				showElement(el); 
 			}
-			else { HideElement(el); }
+			else { hideElement(el); }
 		}
-		else { HideElement(el); }
+		else { hideElement(el); }
 	});
 }
 
-function ApplyResult(placeholderSelector, restaurantScore) {
+function applyResult(placeholderSelector, restaurantScore) {
 	var restaurantScorePlaceholder = document.querySelector(placeholderSelector);
 	restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
-	RemoveElement('p#nomorvom_loading', restaurantScorePlaceholder);
-	RemoveElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
+	removeElement('p#nomorvom_loading', restaurantScorePlaceholder);
+	removeElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
 	if (restaurantScore.rating > 0) {
 		for (var i = 0; i < restaurantScore.rating; i++) {
-			AppendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
+			appendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
 		}
 		for (var i = 0; i < 5 - restaurantScore.rating; i++) {
-			AppendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
+			appendImg(restaurantScorePlaceholder, 'toilet-paper-icon_32.png');
 		}
 	}
 	var resultText = document.createElement('div');
@@ -66,7 +66,7 @@ function ApplyResult(placeholderSelector, restaurantScore) {
 	restaurantScorePlaceholder.appendChild(resultText);
 }
 
-function CreateScorePlaceholderElement(loadingImageSource) {
+function createScorePlaceholderElement(loadingImageSource) {
     var scorePlaceholder = document.createElement('div');
 	scorePlaceholder.id = "nomorvom";
 	var loadingText = document.createElement('p');
@@ -85,7 +85,7 @@ function CreateScorePlaceholderElement(loadingImageSource) {
 	return scorePlaceholder;
 }
 
-function CreateConfigElement() {
+function createConfigElement() {
 	var config = document.createElement('div');
 	config.id = "nomorvom_config"
 	var sliderLabel = document.createElement('p');
@@ -101,7 +101,7 @@ function CreateConfigElement() {
 		max: 5,
 		step: 1,
 		slide: function( event, ui ) {
-			ApplyFilter(ui.values, restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
+			applyFilter(ui.values, restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
 		}
 	});
 	var vals = $(scoreFilterSlider).slider("option", "max") - $(scoreFilterSlider).slider("option", "min");
@@ -120,7 +120,7 @@ function CreateConfigElement() {
 	excludeNoDataCheckbox.id = "nomorvom_config_excludeNoData_checkbox";
 	excludeNoDataCheckbox.checked = true;
 	excludeNoDataCheckbox.addEventListener('change', function() {
-		ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, excludeNoDataCheckbox.checked);
+		applyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, excludeNoDataCheckbox.checked);
 	});
 	excludeNoDataLabel.appendChild(excludeNoDataCheckbox);
 	config.appendChild(excludeNoDataLabel);
@@ -130,20 +130,20 @@ function CreateConfigElement() {
 // Just-Eat
 if (window.location.href.indexOf("just-eat.co.uk") > -1) {
 	var restaurantEntries = document.querySelectorAll('div.c-restaurant');
-	var config = CreateConfigElement();
+	var config = createConfigElement();
 	var restaurantsDiv = document.querySelector("div[data-ft='openRestaurantsList']");
 	restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 	var port = chrome.runtime.connect({name:"scorelookup"});
 	port.onMessage.addListener(function(restaurantScore) {
-		ApplyResult("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom", restaurantScore);
-		ApplyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
+		applyResult("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom", restaurantScore);
+		applyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
 	});
 	var restaurantId = 0;
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 	    var name = el.querySelector("h2[itemprop='name']").textContent.trim();
 	    var address = el.querySelector('p.c-restaurant__address').textContent.trim();
 		port.postMessage({id:restaurantId, name:name, address:address});
-		var scorePlaceholder = CreateScorePlaceholderElement(chrome.extension.getURL('loading.gif'));		
+		var scorePlaceholder = createScorePlaceholderElement(chrome.extension.getURL('loading.gif'));		
 		el.setAttribute('data-nomorvom-id', restaurantId);
 		el.appendChild(scorePlaceholder);
 	    restaurantId++;
@@ -153,16 +153,16 @@ if (window.location.href.indexOf("just-eat.co.uk") > -1) {
 // Hungry House
 if (window.location.href.indexOf("hungryhouse.co.uk") > -1) {
 	var restaurantEntries = document.querySelectorAll('div.restaurantBlock'); 
-	//var config = CreateConfigElement(); 
+	//var config = createConfigElement(); 
   	//var restaurantsDiv = document.querySelector("div.searchItems"); 
   	//restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 	var port = chrome.runtime.connect({name:"linkedPageScoreLookup"});
 	port.onMessage.addListener(function(restaurantScore) {
-	    var scorePlaceholder = CreateScorePlaceholderElement(chrome.extension.getURL('loading.gif'));
+	    var scorePlaceholder = createScorePlaceholderElement(chrome.extension.getURL('loading.gif'));
     	var restaurantElement = document.querySelector("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes")
 	    restaurantElement.appendChild(scorePlaceholder);
 
-		ApplyResult("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes div#nomorvom", restaurantScore);
+		applyResult("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes div#nomorvom", restaurantScore);
 	});
 	
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
