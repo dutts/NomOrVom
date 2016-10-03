@@ -21,26 +21,30 @@ function appendImg(element, filename) {
     element.appendChild(img);
 }
 
-function applyFilter(ratingFilterRange, restaurantEntries, excludeNoData) {
-	excludeNoData = typeof excludeNoData !== 'undefined' ? excludeNoData : true;
+function applyFilter(restaurantEntries) {
+    var ratingFilterRange = $("#nov-cfg-filter-slider").slider("values");
+    var excludeNoData = document.getElementById("nov-cfg-exclude-filter").checked;
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
-		var ratingElement = el.querySelectorAll('div#nomorvom[data-rating]');
-		if (ratingElement.length) {
-			var rating = Number(ratingElement[0].getAttribute('data-rating'));
-			if ( (rating < 0 && excludeNoData == false) || (rating >= Number(ratingFilterRange[0]) && rating <= Number(ratingFilterRange[1])) ) { 
+		var ratingElement = el.querySelectorAll('.nov-score[data-rating]');
+	    if (ratingElement.length) {
+	        var rating = Number(ratingElement[0].getAttribute('data-rating'));
+	        if ((rating < 0 && excludeNoData == false) ||
+	            (rating >= Number(ratingFilterRange[0]) && rating <= Number(ratingFilterRange[1]))) {
 				showElement(el); 
-			}
-			else { hideElement(el); }
-		}
-		else { hideElement(el); }
+	        } else {
+	            hideElement(el);
+	        }
+	    } else {
+	        hideElement(el);
+	    }
 	});
 }
 
 function applyResult(placeholderSelector, restaurantScore) {
 	var restaurantScorePlaceholder = document.querySelector(placeholderSelector);
 	restaurantScorePlaceholder.setAttribute('data-rating', restaurantScore.rating);
-	removeElement('p#nomorvom_loading', restaurantScorePlaceholder);
-	removeElement('div#nomorvom_progressbar', restaurantScorePlaceholder);
+	removeElement('.nov-score .nov-loading', restaurantScorePlaceholder);
+	removeElement('.nov-score .nov-progress', restaurantScorePlaceholder);
 	if (restaurantScore.rating > -1) {
 		for (var i = 0; i < restaurantScore.rating; i++) {
 			appendImg(restaurantScorePlaceholder, '48-fork-and-knife-icon.png');
@@ -50,7 +54,7 @@ function applyResult(placeholderSelector, restaurantScore) {
 		}
 	}
 	var resultText = document.createElement('div');
-	resultText.id = "nomorvom_hygieneScore"
+	resultText.className = "nov-rating"
 	if (restaurantScore.rating == "AwaitingInspection") {
 		resultText.textContent = "This takeaway is awaiting inspection";					
 		restaurantScore.rating = 0;
@@ -70,12 +74,12 @@ function applyResult(placeholderSelector, restaurantScore) {
 
 function createScorePlaceholderElement(loadingImageSource) {
     var scorePlaceholder = document.createElement('div');
-	scorePlaceholder.id = "nomorvom";
+	scorePlaceholder.className = "nov-score";
 	var loadingText = document.createElement('p');
-	loadingText.id = "nomorvom_loading";
+	loadingText.className = "nov-loading";
 	loadingText.textContent = "Loading food scores...";
     var loaderImg = document.createElement('div');
-	loaderImg.id = "nomorvom_progressbar";
+	loaderImg.className = "nov-progress";
 	var img = new Image();
 	img.onload = function() {
   		loaderImg.appendChild(img);
@@ -87,59 +91,67 @@ function createScorePlaceholderElement(loadingImageSource) {
 	return scorePlaceholder;
 }
 
-function createConfigElement() {
-	var config = document.createElement('div');
-	config.id = "nomorvom_config"
-	var sliderLabel = document.createElement('p');
-	sliderLabel.id = "nomorvom_config_title";
-	sliderLabel.appendChild(document.createTextNode("Move the sliders to filter results by hygiene rating:"));
-	config.appendChild(sliderLabel);
-	var scoreFilterSlider = document.createElement('div');
-	scoreFilterSlider.id = "scoreFilterSlider";
-	$(scoreFilterSlider).slider({
-		range: true,
-		values: [0, 5],
-		min: 0,
-		max: 5,
-		step: 1,
-		slide: function( event, ui ) {
-			applyFilter(ui.values, restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
-		}
-	});
-	var vals = $(scoreFilterSlider).slider("option", "max") - $(scoreFilterSlider).slider("option", "min");
-	// Space out values
-	for (var i = 0; i <= vals; i++) {
-		var el = $('<label>'+(i)+'</label>').css('left',(i/vals*100)+'%');
+function createConfigElement(siteId) {
 
-		$(scoreFilterSlider).append(el);
-	}
-	config.appendChild(scoreFilterSlider);
-	var excludeNoDataLabel = document.createElement('p');
-	excludeNoDataLabel.id = "nomorvom_config_excludeNoData";
-	excludeNoDataLabel.appendChild(document.createTextNode("Exclude 'No Result' Entries:"));
-	var excludeNoDataCheckbox = document.createElement('input');
-	excludeNoDataCheckbox.type = "checkbox"
-	excludeNoDataCheckbox.id = "nomorvom_config_excludeNoData_checkbox";
-	excludeNoDataCheckbox.checked = true;
-	excludeNoDataCheckbox.addEventListener('change', function() {
-		applyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, excludeNoDataCheckbox.checked);
-	});
-	excludeNoDataLabel.appendChild(excludeNoDataCheckbox);
-	config.appendChild(excludeNoDataLabel);
+    const min = 0, max = 5;
+    var labels = "";
+
+    for (var i = min; i <= max; i++) {
+        labels += `<label>${i}</label>`
+    }
+
+    const tmpl =
+        `<div class="nov-cfg-inner">
+            <p>Move the sliders to filter results by hygiene rating: </p>
+            <div id="nov-cfg-filter">
+                <div id="nov-cfg-filter-slider" />
+            </div>
+            <div class="nov-cfg-filter-labels">${labels}</div>
+            <p class="nov-cfg-exclude">
+                Exclude 'No Result' Entries:
+                <input id="nov-cfg-exclude-filter" type="checkbox" checked="true" />
+            </p>
+        </div>`;
+
+	var config = document.createElement('div');
+	config.id = "nov-cfg"
+    config.className = `nov-cfg-${siteId}`;
+    config.innerHTML = tmpl;
+
+    $(config).find("#nov-cfg-filter-slider")
+        .slider({
+            range: true,
+            values: [min, max],
+            min: min,
+            max: max,
+            step: 1,
+            change: function (event, ui) {
+                applyFilter(restaurantEntries);
+            }
+        });
+
+    config.querySelector("#nov-cfg-exclude-filter")
+        .addEventListener('change',
+            function() {
+                applyFilter(restaurantEntries);
+            });
+
 	return config;
 }
 
 // Just-Eat
 if (window.location.href.indexOf("just-eat.co.uk") > -1) {
-	var restaurantEntries = document.querySelectorAll('div.c-restaurant');
-	var config = createConfigElement();
+	var config = createConfigElement("je");
 	var restaurantsDiv = document.querySelector("div[data-ft='openRestaurantsList']");
 	restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
-	var port = chrome.runtime.connect({name:"scorelookup"});
+	var restaurantEntries = document.querySelectorAll('div.c-restaurant:not(.c-restaurant--offline)');
+
+    var port = chrome.runtime.connect({ name: "scorelookup" });
 	port.onMessage.addListener(function(restaurantScore) {
-		applyResult("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div#nomorvom", restaurantScore);
-		applyFilter($(scoreFilterSlider).slider("values"), restaurantEntries, document.getElementById('nomorvom_config_excludeNoData_checkbox').checked);
+		applyResult("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div.nov-score", restaurantScore);
+		applyFilter(restaurantEntries);
 	});
+
 	var restaurantId = 0;
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
 	    var name = el.querySelector("h2[itemprop='name']").textContent.trim();

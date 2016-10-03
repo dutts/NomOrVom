@@ -1,47 +1,49 @@
-#scoreFilterSlider label {
-    position: absolute;
-    width: 20px;
-    font-size: x-small;
-    margin-left: -10px;
-    text-align: center;
-    margin-top: 15px;
-    margin-bottom: 20px;
+#nov-cfg {
 }
 
-#scoreFilterSlider {
-    width: 70%;
-    margin: auto;
-}
+    #nov-cfg .nov-cfg-inner {
+        padding: 4px 10px 0px 10px;
+        border: thin dashed red;
+        background-color: #FFEBE6;
+        font-weight: bold;
+        font-size: small;
+    }
 
-.ui-slider-range { background: red; }
+    #nov-cfg p {
+        line-height: 1.8em;
+        margin-bottom: 6px;
+    }
 
-#nomorvom_config_title {
-    margin-bottom: 10px;
-}
+    #nov-cfg .ui-slider {
+        width: 70%;
+        margin: auto;
+    }
 
-#nomorvom_config_excludeNoData {
-    margin-top: 20px;
-}
+    #nov-cfg .ui-slider-range {
+        background: red;
+    }
 
-#nomorvom_config_excludeNoData_checkbox {
-    margin-left: 10px;
-}
+    #nov-cfg .nov-cfg-filter-labels {
+        overflow: auto;
+        display: block;
+        padding-left: 14.5%;
+    }
 
-#nomorvom_hygieneScore {
-    font-weight: bold;
-    margin: 0px 5px;
-}
+        #nov-cfg .nov-cfg-filter-labels label {
+            float: left;
+            width: 16.5%;
+            font-size: x-small;
+            margin-left: 0px;
+            margin-top: 8px;
+            margin-bottom: 2px;
+        }
 
-#nomorvom_config {
-    border: thin dashed red;
-    background-color: #FFEBE6;
-    font-weight: bold;
-    font-size: small;
-    padding: 5px 10px 5px 10px;
-    margin: 5px;
-}
+    #nov-cfg .nov-cfg-exclude input {
+        margin-left: 6px;
+        margin-top: 8px;
+    }
 
-#nomorvom {
+.nov-score {
     border: thin dashed red;
     background-color: #FFEBE6;
     font-size: small;
@@ -50,12 +52,33 @@
     width: 235px;
 }
 
-#nomorvom_loading {
-    font-weight: bold;
-    padding: 0px 5px;
+    .nov-score .nov-je {
+    }
+
+    .nov-score .nov-loading {
+        font-weight: bold;
+        padding: 0px 5px;
+    }
+
+    .nov-score .nov-progress {
+        width: 220px;
+        height: 30px;
+    }
+
+    .nov-score .nov-rating {
+        font-weight: bold;
+        margin: 0px 5px;
+    }
+
+/* Just eat styles */
+.nov-cfg-je {
+    padding: 16px 0;
 }
 
-#nomorvom_progressbar {
-    width: 220px;
-    height: 30px;
+.nov-cfg-hh {
+    margin: 5px;
+    padding: 5px 10px 5px 10px;
 }
+
+/* Hungry House styles */
+
