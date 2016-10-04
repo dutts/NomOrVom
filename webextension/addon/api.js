@@ -63,6 +63,12 @@ function applyResult(placeholderSelector, restaurantScore) {
 		if (restaurantScore.rating == -1) {
 			resultText.textContent = "Sorry, no food hygiene data found";
 		}
+		else if (restaurantScore.rating == "Pass") {
+			resultText.textContent = "FHIS - Pass";
+		}
+		else if (restaurantScore.rating == "ImprovementRequired") {
+			resultText.textContent = "FHIS - Improvement Required"
+		}
 		else {
 			resultText.textContent = "Hygiene Score : " + restaurantScore.rating + "/5";
 			resultText.appendChild(document.createElement('br')); 
