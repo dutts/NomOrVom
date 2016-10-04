@@ -5,7 +5,7 @@ function lookupRating(id, name, address, postFunc) {
 	var ratingDate = '';
 
 	var xhr = new XMLHttpRequest();
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = () => {
 		if (xhr.readyState == 4)
 		{
 			var resp = JSON.parse(xhr.responseText);
@@ -41,19 +41,19 @@ function postcodeOrAddress(addressString) {
 	return address;
 }
 
-chrome.runtime.onConnect.addListener(function(port){
+chrome.runtime.onConnect.addListener(port => {
 	if(port.name == "scorelookup") {
-		port.onMessage.addListener(function(restaurant) {
+		port.onMessage.addListener( restaurant => {
 			var address = postcodeOrAddress(restaurant.address);
-			lookupRating(restaurant.id, restaurant.name, address, function(id, rating, ratingDate) { 
+			lookupRating(restaurant.id, restaurant.name, address, (id, rating, ratingDate) => { 
 				port.postMessage({id:id, rating:rating, date:ratingDate});
 			});
 	  	});
 	}
 	if(port.name == "linkedPageScoreLookup") {
-		port.onMessage.addListener(function(restaurant) {
+		port.onMessage.addListener(restaurant => {
 			var xhr = new XMLHttpRequest();
-			xhr.onload = function() {
+			xhr.onload = () => {
 				if (xhr.readyState == 4)
 				{
 					var pageDoc = xhr.responseXML;
@@ -72,7 +72,7 @@ chrome.runtime.onConnect.addListener(function(port){
 
 					var address = postcodeOrAddress(restaurantAddress);
 			
-					lookupRating(restaurant.id, restaurant.name, address, function(id, rating, ratingDate) { 
+					lookupRating(restaurant.id, restaurant.name, address, (id, rating, ratingDate) => { 
 						port.postMessage({id:id, rating:rating, date:ratingDate});
 					});		
 				}

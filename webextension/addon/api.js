@@ -24,7 +24,7 @@ function appendImg(element, filename) {
 function applyFilter(restaurantEntries) {
     var ratingFilterRange = $("#nov-cfg-filter-slider").slider("values");
     var excludeNoData = document.getElementById("nov-cfg-exclude-filter").checked;
-	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
+	Array.prototype.forEach.call(restaurantEntries, (el, i) => {
 		var ratingElement = el.querySelectorAll('.nov-score[data-rating]');
 	    if (ratingElement.length) {
 	        var rating = Number(ratingElement[0].getAttribute('data-rating'));
@@ -81,7 +81,7 @@ function createScorePlaceholderElement(loadingImageSource) {
     var loaderImg = document.createElement('div');
 	loaderImg.className = "nov-progress";
 	var img = new Image();
-	img.onload = function() {
+	img.onload = () => {
   		loaderImg.appendChild(img);
 	};
 	img.src = loadingImageSource;
@@ -92,7 +92,6 @@ function createScorePlaceholderElement(loadingImageSource) {
 }
 
 function createConfigElement(siteId) {
-
     const min = 0, max = 5;
     var labels = "";
 
@@ -125,14 +124,14 @@ function createConfigElement(siteId) {
             min: min,
             max: max,
             step: 1,
-            change: function (event, ui) {
+            change: (event, ui) => {
                 applyFilter(restaurantEntries);
             }
         });
 
     config.querySelector("#nov-cfg-exclude-filter")
         .addEventListener('change',
-            function() {
+          	() => {
                 applyFilter(restaurantEntries);
             });
 
@@ -147,13 +146,13 @@ if (window.location.href.indexOf("just-eat.co.uk") > -1) {
 	var restaurantEntries = document.querySelectorAll('div.c-restaurant:not(.c-restaurant--offline)');
 
     var port = chrome.runtime.connect({ name: "scorelookup" });
-	port.onMessage.addListener(function(restaurantScore) {
+	port.onMessage.addListener( restaurantScore => {
 		applyResult("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div.nov-score", restaurantScore);
 		applyFilter(restaurantEntries);
 	});
 
 	var restaurantId = 0;
-	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
+	Array.prototype.forEach.call(restaurantEntries, (el, i) => {
 	    var name = el.querySelector("h2[itemprop='name']").textContent.trim();
 	    var address = el.querySelector('p.c-restaurant__address').textContent.trim();
 		port.postMessage({id:restaurantId, name:name, address:address});
@@ -171,14 +170,14 @@ if (window.location.href.indexOf("hungryhouse.co.uk") > -1) {
   	//var restaurantsDiv = document.querySelector("div.searchItems"); 
   	//restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 	var port = chrome.runtime.connect({name:"linkedPageScoreLookup"});
-	port.onMessage.addListener(function(restaurantScore) {
+	port.onMessage.addListener( restaurantScore => {
 	    var scorePlaceholder = createScorePlaceholderElement(chrome.extension.getURL('loading.gif'));
     	var restaurantElement = document.querySelector("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes")
 	    restaurantElement.appendChild(scorePlaceholder);
 		applyResult("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes div.nov-score", restaurantScore);
 	});
 	
-	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
+	Array.prototype.forEach.call(restaurantEntries, (el, i) => {
 		var restaurantId = el.getAttribute("data-id");
 	    var name = el.querySelector('a.restPageLink').textContent.trim(); 
     	var pageUri = el.querySelector('a.restPageLink').getAttribute('href').trim();
