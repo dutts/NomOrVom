@@ -175,8 +175,7 @@ if (window.location.href.indexOf("hungryhouse.co.uk") > -1) {
 	    var scorePlaceholder = createScorePlaceholderElement(chrome.extension.getURL('loading.gif'));
     	var restaurantElement = document.querySelector("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes")
 	    restaurantElement.appendChild(scorePlaceholder);
-
-		applyResult("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes div#nomorvom", restaurantScore);
+		applyResult("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes div.nov-score", restaurantScore);
 	});
 	
 	Array.prototype.forEach.call(restaurantEntries, function (el, i) {
