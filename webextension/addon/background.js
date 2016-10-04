@@ -45,8 +45,8 @@ chrome.runtime.onConnect.addListener(port => {
 	if(port.name == "scorelookup") {
 		port.onMessage.addListener( restaurant => {
 			var address = postcodeOrAddress(restaurant.address);
-			lookupRating(restaurant.id, restaurant.name, address, (id, rating, ratingDate) => { 
-				port.postMessage({id:id, rating:rating, date:ratingDate});
+			lookupRating(restaurant.id, restaurant.name, address, (id, rating, date) => { 
+				port.postMessage({id, rating, date});
 			});
 	  	});
 	}
@@ -72,8 +72,8 @@ chrome.runtime.onConnect.addListener(port => {
 
 					var address = postcodeOrAddress(restaurantAddress);
 			
-					lookupRating(restaurant.id, restaurant.name, address, (id, rating, ratingDate) => { 
-						port.postMessage({id:id, rating:rating, date:ratingDate});
+					lookupRating(restaurant.id, restaurant.name, address, (id, rating, date) => { 
+						port.postMessage({id, rating, date});
 					});		
 				}
 			};
