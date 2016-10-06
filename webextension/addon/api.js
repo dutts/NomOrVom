@@ -28,7 +28,11 @@ function applyFilter(restaurantEntries) {
 		var ratingElement = el.querySelectorAll('.nov-score[data-rating]');
 	    if (ratingElement.length) {
 	        var rating = Number(ratingElement[0].getAttribute('data-rating'));
-	        if ((rating < 0 && excludeNoData == false) ||
+	        if (rating == NaN) {
+	        	// Scottish results are "Pass" "NeedsImprovement" so can't filter just yet
+	        	showElement(el);
+	        }
+	        else if ((rating < 0 && excludeNoData == false) ||
 	            (rating >= Number(ratingFilterRange[0]) && rating <= Number(ratingFilterRange[1]))) {
 				showElement(el); 
 	        } else {
@@ -56,23 +60,21 @@ function applyResult(placeholderSelector, restaurantScore) {
 	var resultText = document.createElement('div');
 	resultText.className = "nov-rating"
 	if (restaurantScore.rating == "AwaitingInspection") {
-		resultText.textContent = "This takeaway is awaiting inspection";					
+		resultText.innerHTML = "This takeaway is awaiting inspection";					
 		restaurantScore.rating = 0;
 	}	
 	else {
 		if (restaurantScore.rating == -1) {
-			resultText.textContent = "Sorry, no food hygiene data found";
+			resultText.innerHTML = "Sorry, no food hygiene data found";
 		}
 		else if (restaurantScore.rating == "Pass") {
-			resultText.textContent = "FHIS - Pass";
+			resultText.innerHTML = `FHIS - Pass<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
 		}
-		else if (restaurantScore.rating == "ImprovementRequired") {
-			resultText.textContent = "FHIS - Improvement Required"
+		else if (restaurantScore.rating == "Improvement Required") {
+			resultText.innerHTML = `FHIS - Improvement Required<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
 		}
 		else {
-			resultText.textContent = "Hygiene Score : " + restaurantScore.rating + "/5";
-			resultText.appendChild(document.createElement('br')); 
-    		resultText.appendChild(document.createTextNode("Rated on " + restaurantScore.date.substring(0, 10)));
+			resultText.innerHTML = `Hygiene Score : ${restaurantScore.rating}/5<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
 		}
 	}
 	restaurantScorePlaceholder.appendChild(resultText);
@@ -114,7 +116,7 @@ function createConfigElement(siteId) {
             <div class="nov-cfg-filter-labels">${labels}</div>
             <p class="nov-cfg-exclude">
                 Exclude 'No Result' Entries:
-                <input id="nov-cfg-exclude-filter" type="checkbox" checked="true" />
+                <input id="nov-cfg-exclude-filter" type="checkbox"/>
             </p>
         </div>`;
 
@@ -154,7 +156,7 @@ if (window.location.href.indexOf("just-eat.co.uk") > -1) {
     var port = chrome.runtime.connect({ name: "scorelookup" });
 	port.onMessage.addListener( restaurantScore => {
 		applyResult("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div.nov-score", restaurantScore);
-		applyFilter(restaurantEntries);
+		//applyFilter(restaurantEntries);
 	});
 
 	var restaurantId = 0;
