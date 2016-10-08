@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "NomOrVom",
-  "version": "0.22",
-  "description": "How clean is your takeaway? Food.gov.uk hygiene scores in your Just Eat and Hungry House search results",
+  "version": "0.23",
+  "description": "How clean is your takeaway? Food.gov.uk hygiene scores in your Just Eat, Hungry House and Deliveroo search results",
   "author": "Richard Dutton",
   "icons": { "32": "toilet-paper-icon_32.png",
 			 "48": "toilet-paper-icon_48.png",
