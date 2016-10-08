@@ -28,7 +28,7 @@ function applyFilter(restaurantEntries) {
 		var ratingElement = el.querySelectorAll('.nov-score[data-rating]');
 	    if (ratingElement.length) {
 	        var rating = Number(ratingElement[0].getAttribute('data-rating'));
-	        if (rating == NaN) {
+	        if (isNaN(rating)) {
 	        	// Scottish results are "Pass" "NeedsImprovement" so can't filter just yet
 	        	showElement(el);
 	        }
@@ -59,18 +59,32 @@ function applyResult(placeholderSelector, restaurantScore) {
 	}
 	var resultText = document.createElement('div');
 	resultText.className = "nov-rating"
-	if (restaurantScore.rating == "AwaitingInspection") {
+	if (restaurantScore.rating == "AwaitingInspection" || restaurantScore.rating == "Awaiting inspection") {
 		resultText.innerHTML = "This takeaway is awaiting inspection";					
 		restaurantScore.rating = 0;
-	}	
+	}
+	else if (restaurantScore.rating == "Exempt") {
+		resultText.innerHTML = "This takeaway is exempt from inspection";					
+		restaurantScore.rating = 0;		
+	}
+	else if (restaurantScore.rating == "Awaiting publication") {
+		resultText.innerHTML = "This takeaway's rating is awaiting publication";					
+		restaurantScore.rating = 0;		
+	}		
 	else {
 		if (restaurantScore.rating == -1) {
 			resultText.innerHTML = "Sorry, no food hygiene data found";
 		}
 		else if (restaurantScore.rating == "Pass") {
+			hideElement(document.querySelector(".nov-cfg-inner"));
 			resultText.innerHTML = `FHIS - Pass<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
 		}
+		else if (restaurantScore.rating == "Pass and Eatsafe") {
+			hideElement(document.querySelector(".nov-cfg-inner"))
+			resultText.innerHTML = `FHIS - Pass and Eatsafe<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
+		}
 		else if (restaurantScore.rating == "Improvement Required") {
+			hideElement(document.querySelector(".nov-cfg-inner"))
 			resultText.innerHTML = `FHIS - Improvement Required<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
 		}
 		else {
@@ -156,7 +170,7 @@ if (window.location.href.indexOf("just-eat.co.uk") > -1) {
     var port = chrome.runtime.connect({ name: "scorelookup" });
 	port.onMessage.addListener( restaurantScore => {
 		applyResult("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div.nov-score", restaurantScore);
-		//applyFilter(restaurantEntries);
+		applyFilter(restaurantEntries);
 	});
 
 	var restaurantId = 0;
