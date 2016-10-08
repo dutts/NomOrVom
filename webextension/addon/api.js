@@ -191,7 +191,7 @@ if (window.location.href.indexOf("hungryhouse.co.uk") > -1) {
 	//var config = createConfigElement(); 
   	//var restaurantsDiv = document.querySelector("div.searchItems"); 
   	//restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
-	var port = chrome.runtime.connect({name:"linkedPageScoreLookup"});
+	var port = chrome.runtime.connect({name:"hungryHouseLinkedPageScoreLookup"});
 	port.onMessage.addListener( restaurantScore => {
 	    var scorePlaceholder = createScorePlaceholderElement(chrome.extension.getURL('loading.gif'));
     	var restaurantElement = document.querySelector("div.restaurantBlock[data-id='"+restaurantScore.id+"'] div.restsSearchItemRes")
@@ -207,3 +207,25 @@ if (window.location.href.indexOf("hungryhouse.co.uk") > -1) {
 		port.postMessage({id:restaurantId, name:name, fullPageUri:fullPageUri});	    
 	});
 }
+
+// Deliveroo
+if (window.location.href.indexOf("deliveroo.co.uk") > -1) {
+	var restaurantEntries = document.querySelectorAll('li.restaurant-index-page-tile'); 
+	var port = chrome.runtime.connect({name:"deliverooLinkedPageScoreLookup"});
+	port.onMessage.addListener( restaurantScore => {
+		applyResult("li.restaurant-index-page-tile[data-nomorvom-id='"+restaurantScore.id+"'] div.nov-score", restaurantScore);
+	});
+	
+	var restaurantId = 0;
+	Array.prototype.forEach.call(restaurantEntries, (el, i) => {
+	    var name = el.querySelector('h3.restaurant-index-page-tile--name').textContent.trim(); 
+    	var pageUri = el.querySelector('a.restaurant-index-page-tile--anchor').getAttribute('href').trim();
+		var fullPageUri = window.location.protocol + "//" + window.location.host + pageUri;
+		port.postMessage({id:restaurantId, name:name, fullPageUri:fullPageUri});
+		var scorePlaceholder = createScorePlaceholderElement(chrome.extension.getURL('loading.gif'));
+		el.setAttribute('data-nomorvom-id', restaurantId);
+		el.appendChild(scorePlaceholder);
+		restaurantId++;	    
+	});
+}
+
