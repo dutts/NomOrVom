@@ -119,7 +119,7 @@ function createConfigElement(siteId) {
         `<div class="nov-cfg-inner">
             <p>Move the sliders to filter results by hygiene rating: </p>
             <div id="nov-cfg-filter">
-                <div id="nov-cfg-filter-slider" class="nov-cfg-filter-slider noUi-extended" />
+                <div id="nov-cfg-filter-slider" class="nov-cfg-filter-slider" />
             </div>
             <p class="nov-cfg-exclude">
                 Exclude 'No Result' Entries:
