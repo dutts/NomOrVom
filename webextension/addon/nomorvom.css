@@ -19,6 +19,26 @@
         margin-top: 8px;
     }
 
+    #nov-cfg-filter-slider {
+        margin-left: 30px;
+        margin-right: 30px;
+        margin-top: 15px;
+        margin-bottom: 10px;
+    }
+
+    #nov-cfg .nov-cfg-filter-labels { 
+        display: flex;
+        justify-content: space-between;
+        padding-left: 5%; 
+        padding-right: 5%;
+    } 
+ 
+    #nov-cfg .nov-cfg-filter-labels label { 
+        font-size: large;
+        margin-bottom: 2px; 
+    } 
+    
+
 .nov-score {
     border: thin dashed red;
     background-color: #FFEBE6;

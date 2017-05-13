@@ -115,12 +115,19 @@ function createScorePlaceholderElement(loadingImageSource) {
 
 function createConfigElement(siteId) {
     const min = 0, max = 5;
+	var labels = ""; 
+ 
+    for (var i = min; i <= max; i++) { 
+        labels += `<label>${i}</label>` 
+    }
+
     const tmpl =
         `<div class="nov-cfg-inner">
             <p>Move the sliders to filter results by hygiene rating: </p>
             <div id="nov-cfg-filter">
                 <div id="nov-cfg-filter-slider" class="nov-cfg-filter-slider" />
             </div>
+			<div class="nov-cfg-filter-labels">${labels}</div>
             <p class="nov-cfg-exclude">
                 Exclude 'No Result' Entries:
                 <input id="nov-cfg-exclude-filter" type="checkbox"/>
@@ -140,11 +147,11 @@ function createConfigElement(siteId) {
 			'min': [ min ],
 			'max': [ max ]
 		},
-		pips: {
-			mode: 'count',
-			values: [6],
-			density: 100
-		}
+//		pips: {
+//			mode: 'count',
+//			values: [6],
+//			density: 100
+//		}
 	});
 	handlesSlider.noUiSlider.on('set', function() { applyFilter(restaurantEntries) });
 
