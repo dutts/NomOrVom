@@ -22,7 +22,7 @@ function appendImg(element, filename) {
 }
 
 function applyFilter(restaurantEntries) {
-    var ratingFilterRange = $("#nov-cfg-filter-slider").slider("values");
+	var ratingFilterRange = document.getElementById('nov-cfg-filter-slider').noUiSlider.get();
     var excludeNoData = document.getElementById("nov-cfg-exclude-filter").checked;
 	Array.prototype.forEach.call(restaurantEntries, (el, i) => {
 		var ratingElement = el.querySelectorAll('.nov-score[data-rating]');
@@ -115,19 +115,19 @@ function createScorePlaceholderElement(loadingImageSource) {
 
 function createConfigElement(siteId) {
     const min = 0, max = 5;
-    var labels = "";
-
-    for (var i = min; i <= max; i++) {
-        labels += `<label>${i}</label>`
+	var labels = ""; 
+ 
+    for (var i = min; i <= max; i++) { 
+        labels += `<label>${i}</label>` 
     }
 
     const tmpl =
         `<div class="nov-cfg-inner">
             <p>Move the sliders to filter results by hygiene rating: </p>
             <div id="nov-cfg-filter">
-                <div id="nov-cfg-filter-slider" />
+                <div id="nov-cfg-filter-slider" class="nov-cfg-filter-slider" />
             </div>
-            <div class="nov-cfg-filter-labels">${labels}</div>
+			<div class="nov-cfg-filter-labels">${labels}</div>
             <p class="nov-cfg-exclude">
                 Exclude 'No Result' Entries:
                 <input id="nov-cfg-exclude-filter" type="checkbox"/>
@@ -139,17 +139,21 @@ function createConfigElement(siteId) {
     config.className = `nov-cfg-${siteId}`;
     config.innerHTML = tmpl;
 
-    $(config).find("#nov-cfg-filter-slider")
-        .slider({
-            range: true,
-            values: [min, max],
-            min: min,
-            max: max,
-            step: 1,
-            change: (event, ui) => {
-                applyFilter(restaurantEntries);
-            }
-        });
+	var handlesSlider = config.getElementsByClassName('nov-cfg-filter-slider')[0];
+	noUiSlider.create(handlesSlider, {
+		start: [ min, max ],
+		step: 1,
+		range: {
+			'min': [ min ],
+			'max': [ max ]
+		},
+//		pips: {
+//			mode: 'count',
+//			values: [6],
+//			density: 100
+//		}
+	});
+	handlesSlider.noUiSlider.on('set', function() { applyFilter(restaurantEntries) });
 
     config.querySelector("#nov-cfg-exclude-filter")
         .addEventListener('change',
