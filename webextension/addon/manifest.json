@@ -1,39 +1,58 @@
 {
-  "manifest_version": 2,
-  "name": "NomOrVom",
-  "version": "0.24",
-  "description": "How clean is your takeaway? Food.gov.uk hygiene scores in your Just Eat, Hungry House and Deliveroo search results",
-  "author": "Richard Dutton",
-  "icons": { "32": "toilet-paper-icon_32.png",
-			 "48": "toilet-paper-icon_48.png",
-			 "64": "toilet-paper-icon_64.png"},
-  "content_scripts": [
-    {
-      "matches": [
-        "http://www.just-eat.co.uk/area/*", 
-        "http://just-eat.co.uk/area/*", 
-        "https://www.just-eat.co.uk/area/*", 
-        "https://just-eat.co.uk/area/*",
-        "http://www.hungryhouse.co.uk/takeaways/*",
-        "http://hungryhouse.co.uk/takeaways/*",
-        "https://www.hungryhouse.co.uk/takeaways/*",
-        "https://hungryhouse.co.uk/takeaways/*",
-        "http://www.deliveroo.co.uk/restaurants/*",
-        "http://deliveroo.co.uk/restaurants/*",
-        "https://www.deliveroo.co.uk/restaurants/*",
-        "https://deliveroo.co.uk/restaurants/*"
-      ],
-      "css": ["nomorvom.css", "nouislider.css"],
-      "js": ["nouislider.js", "api.js"],
-      "run_at": "document_end"
-     }
-  ],
-  "permissions": [
-      "http://*.food.gov.uk/", "https://*.food.gov.uk/", "http://hungryhouse.co.uk/*", "https://hungryhouse.co.uk/*"
-  ],
-  "background": {
-      "scripts": ["background.js"],
-      "persistent": false
-  },
-  "web_accessible_resources": ["48-fork-and-knife-icon.png","toilet-paper-icon_32.png","loading.gif"]
+    "manifest_version": 2,
+    "name": "NomOrVom",
+    "version": "0.24",
+    "description": "How clean is your takeaway? Food.gov.uk hygiene scores in your Just Eat, Hungry House and Deliveroo search results",
+    "author": "Richard Dutton",
+    "icons": {
+        "32": "toilet-paper-icon_32.png",
+        "48": "toilet-paper-icon_48.png",
+        "64": "toilet-paper-icon_64.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "http://www.just-eat.co.uk/area/*",
+                "http://just-eat.co.uk/area/*",
+                "https://www.just-eat.co.uk/area/*",
+                "https://just-eat.co.uk/area/*",
+                "http://www.hungryhouse.co.uk/takeaways/*",
+                "http://hungryhouse.co.uk/takeaways/*",
+                "https://www.hungryhouse.co.uk/takeaways/*",
+                "https://hungryhouse.co.uk/takeaways/*",
+                "http://www.deliveroo.co.uk/restaurants/*",
+                "http://deliveroo.co.uk/restaurants/*",
+                "https://www.deliveroo.co.uk/restaurants/*",
+                "https://deliveroo.co.uk/restaurants/*"
+            ],
+            "css": [
+                "nomorvom.css",
+                "nouislider.css"
+            ],
+            "js": [
+                "nouislider.js",
+                "api.js"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "permissions": [
+        "http://*.food.gov.uk/",
+        "https://*.food.gov.uk/",
+        "http://hungryhouse.co.uk/*",
+        "https://hungryhouse.co.uk/*"
+    ],
+    "background": {
+        "page": "background.html",
+        "persistent": true
+    },
+    "web_accessible_resources": [
+        "48-fork-and-knife-icon.png",
+        "toilet-paper-icon_32.png",
+        "loading.gif"
+    ],
+    "-ms-preload": {
+        "backgroundScript": "backgroundScriptsAPIBridge.js",
+        "contentScript": "contentScriptsAPIBridge.js"
+    }
 }
