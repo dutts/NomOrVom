@@ -146,12 +146,7 @@ function createConfigElement(siteId) {
 		range: {
 			'min': [ min ],
 			'max': [ max ]
-		},
-//		pips: {
-//			mode: 'count',
-//			values: [6],
-//			density: 100
-//		}
+		}
 	});
 	handlesSlider.noUiSlider.on('set', function() { applyFilter(restaurantEntries) });
 
