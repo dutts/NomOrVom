@@ -167,7 +167,7 @@ function createConfigElement(siteId) {
 // Just-Eat
 if (window.location.href.indexOf("just-eat.co.uk") > -1) {
 	var config = createConfigElement("je");
-	var restaurantsDiv = document.querySelector("div[data-ft='openRestaurantsList']");
+	var restaurantsDiv = document.querySelector("div[data-ft='openRestaurantsList'], div[data-ft='closedRestaurantsList']");
 	restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
 	var restaurantEntries = document.querySelectorAll('div.c-restaurant:not(.c-restaurant--offline)');
 
