@@ -217,7 +217,7 @@ if (window.location.href.indexOf("deliveroo.co.uk") > -1) {
 	
 	var restaurantId = 0;
 	Array.prototype.forEach.call(restaurantEntries, (el, i) => {
-	    var name = el.querySelector('h3.restaurant-index-page-tile--name').textContent.trim(); 
+	    var name = el.querySelector('h3.restaurant-index-page-tile--name-range span').textContent.trim(); 
     	var pageUri = el.querySelector('a.restaurant-index-page-tile--anchor').getAttribute('href').trim();
 		var fullPageUri = window.location.protocol + "//" + window.location.host + pageUri;
 		port.postMessage({id:restaurantId, name:name, fullPageUri:fullPageUri});
