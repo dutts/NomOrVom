@@ -23,8 +23,8 @@
         "https://www.deliveroo.co.uk/restaurants/*",
         "https://deliveroo.co.uk/restaurants/*"
       ],
-      "css": ["nomorvom.css", "nouislider.css"],
-      "js": ["nouislider.js", "api.js"],
+      "css": ["nomorvom.css", "nouislider.min.css"],
+      "js": ["nouislider.min.js", "api.js"],
       "run_at": "document_end"
      }
   ],
