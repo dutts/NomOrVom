@@ -49,12 +49,38 @@ function postcodeOrAddress(addressString) {
 }
 
 chrome.runtime.onConnect.addListener(port => {
+	// The simple "scorelookup" is not used anymore - useful when a
+	// web site provides the address straight on the search result
+	// page.
 	if(port.name == "scorelookup") {
 		port.onMessage.addListener( restaurant => {
 			var address = postcodeOrAddress(restaurant.address);
 			lookupRating(restaurant.id, restaurant.name, address, (id, rating, date) => { 
 				port.postMessage({id, rating, date});
 			});
+	  	});
+	}
+	if(port.name == "justEatLinkedPageScoreLookup") {
+		port.onMessage.addListener(restaurant => {
+			var xhr = new XMLHttpRequest();
+			xhr.onload = () => {
+				if (xhr.readyState == 4)
+				{
+					var pageDoc = xhr.responseXML;
+					var addressElement = pageDoc.querySelector('p.address');
+
+					var restaurantAddress = addressElement.innerText.trim();
+
+					var address = postcodeOrAddress(restaurantAddress);
+
+					lookupRating(restaurant.id, restaurant.name, address, (id, rating, date) => {
+						port.postMessage({id, rating, date});
+					});
+				}
+			};
+			xhr.open("GET", restaurant.fullPageUri);
+			xhr.responseType = "document";
+			xhr.send();
 	  	});
 	}
 	if(port.name == "hungryHouseLinkedPageScoreLookup") {

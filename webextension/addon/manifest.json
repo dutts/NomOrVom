@@ -29,7 +29,11 @@
      }
   ],
   "permissions": [
-      "http://*.food.gov.uk/", "https://*.food.gov.uk/", "http://hungryhouse.co.uk/*", "https://hungryhouse.co.uk/*"
+      "http://*.food.gov.uk/",
+      "https://*.food.gov.uk/",
+      "http://hungryhouse.co.uk/*",
+      "https://hungryhouse.co.uk/*",
+      "https://www.just-eat.co.uk/*"
   ],
   "background": {
       "scripts": ["background.js"],

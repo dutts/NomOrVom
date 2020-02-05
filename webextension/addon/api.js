@@ -162,21 +162,23 @@ function createConfigElement(siteId) {
 // Just-Eat
 if (window.location.href.indexOf("just-eat.co.uk") > -1) {
 	var config = createConfigElement("je");
-	var restaurantsDiv = document.querySelector("div[data-ft='openRestaurantsList'], div[data-ft='closedRestaurantsList']");
+	var restaurantsDiv = document.querySelector("div[data-search-container='openrestaurants'], div[data-ft='closedRestaurantsList']");
 	restaurantsDiv.insertBefore(config, restaurantsDiv.firstChild);
-	var restaurantEntries = document.querySelectorAll('div.c-restaurant:not(.c-restaurant--offline)');
+	var restaurantEntries = document.querySelectorAll('section.c-listing-item:not(.c-restaurant--offline)');
 
-    var port = chrome.runtime.connect({ name: "scorelookup" });
+    var port = chrome.runtime.connect({ name: "justEatLinkedPageScoreLookup" });
 	port.onMessage.addListener( restaurantScore => {
-		applyResult("div.c-restaurant[data-nomorvom-id='"+restaurantScore.id+"'] div.nov-score", restaurantScore);
+		applyResult("section.c-listing-item[data-nomorvom-id='"+restaurantScore.id+"'] div.nov-score", restaurantScore);
 		applyFilter(restaurantEntries);
 	});
 
 	var restaurantId = 0;
 	Array.prototype.forEach.call(restaurantEntries, (el, i) => {
-	    var name = el.querySelector("h2[itemprop='name']").textContent.trim();
-	    var address = el.querySelector('p.c-restaurant__address').textContent.trim();
-		port.postMessage({id:restaurantId, name:name, address:address});
+	    var name = el.querySelector("h3[itemprop='name']").textContent.trim();
+		var pageUri = el.querySelector("a.c-listing-item-link").getAttribute('href').trim();
+		var fullPageUri = window.location.protocol + "//" + window.location.host + pageUri;
+		console.log("About to ask about restaurant", restaurantId, name, fullPageUri);
+		port.postMessage({id:restaurantId, name:name, fullPageUri:fullPageUri});
 		var scorePlaceholder = createScorePlaceholderElement(chrome.extension.getURL('loading.gif'));		
 		el.setAttribute('data-nomorvom-id', restaurantId);
 		el.appendChild(scorePlaceholder);
