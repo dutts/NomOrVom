@@ -77,18 +77,18 @@ function applyResult(placeholderSelector, restaurantScore) {
 		}
 		else if (restaurantScore.rating == "Pass") {
 			hideElement(document.querySelector(".nov-cfg-inner"));
-			resultText.innerHTML = `FHIS - Pass<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
+			resultText.innerHTML = DOMPurify.sanitize(`FHIS - Pass<br/>Rated on ${restaurantScore.date.substring(0, 10)}`);
 		}
 		else if (restaurantScore.rating == "Pass and Eatsafe") {
 			hideElement(document.querySelector(".nov-cfg-inner"))
-			resultText.innerHTML = `FHIS - Pass and Eatsafe<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
+			resultText.innerHTML = DOMPurify.sanitize(`FHIS - Pass and Eatsafe<br/>Rated on ${restaurantScore.date.substring(0, 10)}`);
 		}
 		else if (restaurantScore.rating == "Improvement Required") {
 			hideElement(document.querySelector(".nov-cfg-inner"))
-			resultText.innerHTML = `FHIS - Improvement Required<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
+			resultText.innerHTML = DOMPurify.sanitize(`FHIS - Improvement Required<br/>Rated on ${restaurantScore.date.substring(0, 10)}`);
 		}
 		else {
-			resultText.innerHTML = `Hygiene Score : ${restaurantScore.rating}/5<br/>Rated on ${restaurantScore.date.substring(0, 10)}`;
+			resultText.innerHTML = DOMPurify.sanitize(`Hygiene Score : ${restaurantScore.rating}/5<br/>Rated on ${restaurantScore.date.substring(0, 10)}`);
 		}
 	}
 	restaurantScorePlaceholder.appendChild(resultText);
